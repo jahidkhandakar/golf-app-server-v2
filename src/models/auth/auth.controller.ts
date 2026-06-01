@@ -10,7 +10,13 @@ import { User } from "./../user/user.model";
 import { TempUser } from "../temp_user/temp.user.model";
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
-  const userData = req.body as any;
+  const userData = {
+    ...req.body,
+    myLocation: {
+      type: "Point",
+      coordinates: req.body.coordinates,
+    },
+  } as any;
 
   const { email } = userData;
 

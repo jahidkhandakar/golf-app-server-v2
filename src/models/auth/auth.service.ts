@@ -16,6 +16,7 @@ import { TempUser } from "./../temp_user/temp.user.model";
 
 const userRegister = async (payload: IUser) => {
   const { email } = payload;
+
   const user = await TempUser.create(payload);
   const otp = generateOTP();
   await saveOTP(email, otp);
@@ -45,7 +46,9 @@ const userRegister = async (payload: IUser) => {
 };
 
 const loginUser = async (email: string, password: string) => {
-  const user = await User.findOne({ email: email.toLowerCase() }).select("+password").lean();
+  const user = await User.findOne({ email: email.toLowerCase() })
+    .select("+password")
+    .lean();
 
   if (!user) {
     throw new AppError(StatusCodes.BAD_REQUEST, "User not found");
@@ -392,12 +395,12 @@ const findOrCreateUser = async (data: {
 
   if (!user) {
     user = await User.create({
-      fullName: data.name,
+      name: data.name,
       email: data.email,
       role: "user",
       provider: data.provider,
       providerId: data.providerId,
-      profilePhoto: data.avatar,
+      image: data.avatar,
     });
   }
 

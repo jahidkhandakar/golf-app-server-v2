@@ -7,17 +7,16 @@ export interface JwtUserPayload {
   role: IRole;
 }
 
-export type IRole = "admin" | "user";
+export type IRole = "admin" | "user" | "basicUser" | "superUser";
 
-export const auth = (...roles: IRole[]): RequestHandler => {
+
+type AuthRole = IRole | "common";
+
+export const auth = (...roles: AuthRole[]): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     const cookieToken = req.cookies.token;
     const token = authHeader?.split(" ")[1] || cookieToken;
-
-    // console.log("Authorization Header:", authHeader);
-    // console.log("Cookie Token:", cookieToken);
-    // console.log("Final Token:", token);
 
     if (!token) {
       console.log("Access denied. No token provided");
@@ -30,12 +29,20 @@ export const auth = (...roles: IRole[]): RequestHandler => {
     try {
       const decoded = jwt.verify(
         token,
-        process.env.JWT_SECRET_KEY!,
+        process.env.JWT_SECRET_KEY as string,
       ) as JwtUserPayload;
-      req.user = decoded; // now typed
 
-      // Check roles
-      if (roles.length > 0 && !roles.includes(decoded.role)) {
+      req.user = decoded;
+
+      // If no role restriction provided → just allow
+      if (roles.length === 0) {
+        return next();
+      }
+
+      // COMMON means allow all authenticated users
+      const isCommonAccess = roles.includes("common");
+
+      if (!isCommonAccess && !roles.includes(decoded.role)) {
         console.log("You are not authorized");
         return res.status(403).json({
           success: false,

@@ -1,5 +1,13 @@
 node_modules
-.env
 /public
 /logs
 distuploads/
+config.bat
+
+
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env*.example

@@ -1,40 +1,65 @@
 import { z } from "zod";
 
-export const registerSchema = z
-  .object({
-    fullName: z.string({
+const registerSchema = z.object({
+  name: z
+    .string({
       message: "Name is required",
+    })
+    .min(1, "Name is required"),
+
+  email: z
+    .string({
+      message: "Email is required",
+    })
+    .email("Invalid email"),
+
+  password: z
+    .string({
+      message: "Password is required",
+    })
+    .min(8, "Password must be at least 8 characters")
+    .refine((value) => /[a-zA-Z]/.test(value), {
+      message: "Password must contain at least 1 letter",
+    })
+    .refine((value) => /\d/.test(value), {
+      message: "Password must contain at least 1 number",
     }),
 
-    email: z
-      .string({
-        message: "Email is required",
-      })
-      .email("Invalid email"),
+  role: z.enum(["admin", "user", "basicUser", "superUser"] as const, {
+    message: "Invalid role",
+  }),
 
-    password: z
-      .string({
-        message: "Password is required",
-      })
-      .min(6, "Password must be at least 6 characters"),
+  country: z
+    .string({
+      message: "Country is required",
+    })
+    .min(1, "Country is required"),
 
-    confirmPassword: z
-      .string({
-        message: "Confirm password is required",
-      })
-      .min(6, "Confirm password must be at least 6 characters"),
+  handicap: z
+    .string({
+      message: "Handicap is required",
+    })
+    .min(1, "Handicap is required"),
 
-    role: z.enum(["admin", "user"] as const),
-  })
-  .superRefine((data, ctx) => {
-    if (data.password !== data.confirmPassword) {
-      ctx.addIssue({
-        path: ["confirmPassword"],
-        message: "Passwords do not match",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-  });
+  coordinates: z
+    .array(z.number(), {
+      message: "Coordinates must be an array of numbers",
+    })
+    .length(2, "Coordinates must contain exactly [longitude, latitude]")
+    .refine(
+      (coords) => {
+        const [lng, lat] = coords;
+
+        const isValidLng = lng >= -180 && lng <= 180;
+        const isValidLat = lat >= -90 && lat <= 90;
+
+        return isValidLng && isValidLat;
+      },
+      {
+        message: "Invalid coordinates range",
+      },
+    ),
+});
 
 const loginUserSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -52,9 +77,7 @@ const otpSchema = z.object({
 });
 
 const forgotPasswordSchema = z.object({
-  email: z
-    .string({ message: "Email is required" })
-    .email("Invalid email"),
+  email: z.string({ message: "Email is required" }).email("Invalid email"),
 });
 
 const resetPasswordSchema = z.object({

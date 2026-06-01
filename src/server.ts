@@ -5,24 +5,49 @@ import app from "./app";
 import { connectDB } from "./config/db";
 import { PORT, NODE_ENV } from "./config";
 import { logger } from "./logger/logger";
+import { initIO } from "./utils/io";
+import redis from "./config/redis";
+import "dotenv/config";
 
 const numCPUs = os.cpus().length;
 
 async function main() {
   const server = http.createServer(app);
   try {
-    await connectDB();
+    // Parallelize service initializations for fast startup
+    logger.info("Starting services...");
+    await Promise.all([connectDB()]);
+    logger.info("Services started.");
+
+    // Initialize Socket.io
+    logger.info("Initializing Socket.io...");
+    initIO(server);
+    logger.info("Socket.io initialized.");
 
     server.listen(Number(PORT), () => {
       logger.info(`🚀 Server is running on Port : ${PORT} [${NODE_ENV}]`);
     });
 
     // Handle exceptions per worker
-    process.on("unhandledRejection", (err) => {
+    process.on("unhandledRejection", (err: any) => {
+      if (
+        err?.code === "ECONNREFUSED" &&
+        err?.port === 6379 &&
+        NODE_ENV === "development"
+      ) {
+        return; // Ignore redis connection issues in dev
+      }
       logger.error(`Server Unhandled rejection: ${err}`);
     });
 
-    process.on("uncaughtException", (error) => {
+    process.on("uncaughtException", (error: any) => {
+      if (
+        error?.code === "ECONNREFUSED" &&
+        error?.port === 6379 &&
+        NODE_ENV === "development"
+      ) {
+        return; // Ignore redis connection issues in dev
+      }
       logger.error(`Server Uncaught exception: ${error}`);
     });
 
@@ -48,7 +73,9 @@ async function main() {
 }
 
 if (cluster.isPrimary && NODE_ENV === "production") {
-  logger.info(`Primary ${process.pid} is running. Forking ${numCPUs} workers...`);
+  logger.info(
+    `Primary ${process.pid} is running. Forking ${numCPUs} workers...`,
+  );
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
   }

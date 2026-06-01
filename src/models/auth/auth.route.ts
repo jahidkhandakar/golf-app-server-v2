@@ -4,15 +4,16 @@ import { authValidation } from "./auth.validateion";
 import { AuthController } from "./auth.controller";
 import { auth } from "./../../middlewares/auth";
 import passport from "passport";
+import { clearCacheMiddleware } from "./../../middlewares/cacheMiddleware";
 
 const router = express.Router();
-
+ 
 router.post(
   "/register",
   validateRequest(authValidation.registerSchema),
   AuthController.registerUser,
 );
-
+ 
 router.post(
   "/login",
   validateRequest(authValidation.loginUserSchema),
@@ -21,6 +22,7 @@ router.post(
 
 router.post(
   "/verify-otp",
+  clearCacheMiddleware("users"),
   validateRequest(authValidation.otpSchema),
   AuthController.verifyOtp,
 );
@@ -45,6 +47,7 @@ router.post(
 
 router.post(
   "/reset-password",
+  clearCacheMiddleware("users"),
   validateRequest(authValidation.resetPasswordSchema),
   AuthController.resetPassword,
 );
@@ -52,6 +55,7 @@ router.post(
 router.post(
   "/change-password",
   auth("admin", "user"),
+  clearCacheMiddleware("users"),
   validateRequest(authValidation.changePasswordSchema),
   AuthController.changePassword,
 );
@@ -66,6 +70,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
+  clearCacheMiddleware("users"),
   AuthController.successLogin,
 );
 
@@ -75,6 +80,7 @@ router.get("/apple", passport.authenticate("apple"));
 router.post(
   "/apple/callback",
   passport.authenticate("apple", { session: false }),
+  clearCacheMiddleware("users"),
   AuthController.successLogin,
 );
 export const AuthRoutes = router;

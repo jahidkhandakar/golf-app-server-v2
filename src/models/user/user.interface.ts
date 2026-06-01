@@ -1,18 +1,81 @@
 import { Document } from "mongoose";
 import { IRole } from "./../../middlewares/auth";
+import { Types } from "mongoose";
 
-export interface IUser extends Document {
-  fullName?: string;
+export type UserRole = "admin" | "user" | "basicUser" | "superUser";
+
+type ProviderType = "google" | "apple";
+
+type UserStatus = "pending" | "active" | "inactive" | "suspended" | "deleted";
+
+interface IGeoPoint {
+  type: "Point";
+  coordinates: number[];
+}
+
+export interface IUser {
+  _id?: Types.ObjectId;
+
+  name: string;
+
   email: string;
+
   password: string;
-  role: IRole;
-  phoneNumber: string;
-  dateOfBirth?: string;
-  profilePhoto?: string;
-  provider?: "google" | "apple";
+
+  role?: UserRole;
+
+  dateOfBirth: string;
+
+  phone: string;
+
+  image?: string;
+
+  coverImage?: Record<string, any>;
+
+  gender?: string;
+
+  country: string;
+
+  myWalet?: string;
+
+  handicap: string;
+
+  clubHandicap?: number | null;
+
+  club?: Types.ObjectId;
+
+  facebookLink?: string;
+  instagramLink?: string;
+  linkdinLink?: string;
+  xLink?: string;
+
+  myLocation?: IGeoPoint;
+  currentLocation?: IGeoPoint;
+
+  privacyPolicyAccepted?: boolean;
+
+  isVerified?: boolean;
+
+  isResetPassword?: boolean;
+
+  isSubscribe?: boolean;
+
+  isAprovedAsSupperUser?: boolean;
+
+  teebox?: string;
+
+  fcmToken?: string;
+
+  oneTimeCode?: string | null;
+
+  provider?: ProviderType;
+
   providerId?: string;
-  isDeleted: boolean;
-  status: "pending" | "active" | "inactive" | "suspended" | "deleted";
+
+  isDeleted?: boolean;
+
+  status?: UserStatus;
+
   createdAt?: Date;
   updatedAt?: Date;
 }

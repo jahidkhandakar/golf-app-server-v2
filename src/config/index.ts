@@ -9,12 +9,42 @@ const envSchema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
   PORT: z.string().transform(Number).default(5000),
-  IP: z.string().optional(),
+  BACKEND_IP: z.string().optional(),
   DATABASE_URL: z.string({
     message: "DATABASE_URL is required",
   }),
   JWT_SECRET_KEY: z.string({
     message: "JWT_SECRET_KEY is required",
+  }),
+  JWT_ACCESS_EXPIRATION_MINUTES: z.string({
+    message: "JWT_ACCESS_EXPIRATION_MINUTES is required",
+  }),
+  JWT_REFRESH_EXPIRATION_DAYS: z.string({
+    message: "JWT_REFRESH_EXPIRATION_DAYS is required",
+  }),
+  JWT_RESET_PASSWORD_EXPIRATION_MINUTES: z.string({
+    message: "JWT_RESET_PASSWORD_EXPIRATION_MINUTES is required",
+  }),
+  JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: z.string({
+    message: "JWT_VERIFY_EMAIL_EXPIRATION_MINUTES is required",
+  }),
+  CONTACT_MAIL: z.string({
+    message: "CONTACT_MAIL is required",
+  }),
+  SENDGRID_API_KEY: z.string({
+    message: "SENDGRID_API_KEY is required",
+  }),
+  EMAIL_FROM: z.string({
+    message: "EMAIL_FROM is required",
+  }),
+  FROM_EMAIL: z.string({
+    message: "FROM_EMAIL is required",
+  }),
+  SMTP_USERNAME: z.string({
+    message: "SMTP_USERNAME is required",
+  }),
+  SMTP_PASSWORD: z.string({
+    message: "SMTP_PASSWORD is required",
   }),
   Nodemailer_GMAIL: z.string().optional(),
   Nodemailer_GMAIL_PASSWORD: z.string().optional(),
@@ -26,15 +56,25 @@ const envSchema = z.object({
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
   AWS_REGION: z.string().optional(),
   AWS_BUCKET_NAME: z.string().optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().optional(),
-  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string({
+    message: "STRIPE_WEBHOOK_SECRET is required",
+  }),
+  STRIPE_SECRET_KEY: z.string({
+    message: "STRIPE_SECRET_KEY is required",
+  }),
   CLIENT_URL: z.string().optional(),
   SUPPORT_EMAIL: z.string().optional(),
   SUPPORT_PHONE: z.string().optional(),
-  OPENAI_API_KEY: z.string().optional(),
-  HF_TOKEN: z.string().optional(),
-  HF_API_KEY_TWO: z.string().optional(),
-  GROQ_API_KEY: z.string().optional(),
+  REDIS_URL: z.string().default("redis://localhost:6379"),
+  SMTP_HOST: z.string({
+    message: "SMTP_HOST is required",
+  }),
+  SMTP_PORT: z.string({
+    message: "SMTP_PORT is required",
+  }),
+  WEB_SERVER_PORT: z.string({
+    message: "WEB_SERVER_PORT is required",
+  }),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -47,11 +87,24 @@ if (!parsedEnv.success) {
 export const {
   NODE_ENV,
   PORT,
-  IP,
+  BACKEND_IP,
   DATABASE_URL,
   JWT_SECRET_KEY,
   Nodemailer_GMAIL,
   Nodemailer_GMAIL_PASSWORD,
+  SMTP_PORT,
+  SMTP_HOST,
+  SMTP_USERNAME,
+  SMTP_PASSWORD,
+  JWT_ACCESS_EXPIRATION_MINUTES,
+  JWT_REFRESH_EXPIRATION_DAYS,
+  JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
+  JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
+  CONTACT_MAIL,
+  SENDGRID_API_KEY,
+  EMAIL_FROM,
+  FROM_EMAIL,
+  WEB_SERVER_PORT,
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
   UPLOAD_FOLDER,
@@ -60,13 +113,10 @@ export const {
   AWS_SECRET_ACCESS_KEY,
   AWS_REGION,
   AWS_BUCKET_NAME,
-  STRIPE_WEBHOOK_SECRET: WEB_HOOK_SECRET,
+  STRIPE_WEBHOOK_SECRET,
   STRIPE_SECRET_KEY,
   CLIENT_URL,
   SUPPORT_EMAIL,
   SUPPORT_PHONE,
-  OPENAI_API_KEY,
-  HF_TOKEN,
-  HF_API_KEY_TWO,
-  GROQ_API_KEY,
+  REDIS_URL,
 } = parsedEnv.data;

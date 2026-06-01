@@ -12,7 +12,7 @@ async function seedDatabase() {
 
     // ADMIN USER SETUP
     const adminUser = {
-      fullName: "Admin User",
+      name: "Admin User",
       email: ADMIN_EMAIL as string,
       password: ADMIN_PASSWORD as string,
       role: "admin" as const,

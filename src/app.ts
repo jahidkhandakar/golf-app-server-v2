@@ -10,6 +10,8 @@ import notFound from "./middlewares/notFound";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import { CLIENT_URL, NODE_ENV } from "./config";
 import sendResponse from "./utils/sendResponse";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger";
 
 const app: Application = express();
 
@@ -47,26 +49,24 @@ app.use(express.static("public"));
 app.use(logHttpRequests);
 
 // ------------------ Routes ------------------
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/v1", router);
 
 app.get("/", (_req: Request, res: Response) => {
-  sendResponse(res, {
-    statusCode: 200,
+  res.status(200).json({
     success: true,
-    message: "Backend API is running successfully",
-    data: {
-      service: "Backend API",
-      environment: NODE_ENV,
-      version: "1.0.0",
-      timestamp: new Date().toISOString(),
-    },
+    service: "GOLF TOURNAMENT APP API",
+    environment: process.env.NODE_ENV ?? "development",
+    version: "1.0.0",
+    timestamp: new Date().toISOString(),
+    message: "API is running successfully",
   });
 });
 
 app.get("/health", (_req, res) => {
-  sendResponse(res, {
-    statusCode: 200,
+  res.status(200).json({
     success: true,
+    statusCode: 200,
     message: "Health check successful",
     data: {
       status: "ok",
@@ -76,6 +76,7 @@ app.get("/health", (_req, res) => {
     },
   });
 });
+
 
 // ------------------ 404 & Error Handling ------------------
 app.use(notFound);

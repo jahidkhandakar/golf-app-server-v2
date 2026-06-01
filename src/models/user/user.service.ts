@@ -2,51 +2,29 @@
 import { User } from "./user.model";
 import AppError from "./../../errors/AppError";
 import { StatusCodes } from "http-status-codes";
+import { queueNotification } from "../../notifications/notification.queue";
+import QueryBuilder from "../../shared/queryBuilder";
+import { IUser } from "./user.interface";
 
 const getAll = async (query: any) => {
-  const { search, date, page = 1, limit = 10 } = query;
+  const filter: any = { ...query, isDeleted: false };
 
-  const filter: any = {
-    role: ["parent", "teen"],
-  };
+  const userQuery = new QueryBuilder<IUser>(User.find(), filter)
+    .search(["name", "email", "role", "status"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
-  if (search) {
-    const trimSearch = search.trim();
-    filter.fullName = { $regex: trimSearch, $options: "i" };
-    filter.email = { $regex: trimSearch, $options: "i" };
-  }
-
-  if (date) {
-    const start = new Date(date);
-    start.setUTCHours(0, 0, 0, 0);
-
-    const end = new Date(date);
-    end.setUTCHours(23, 59, 59, 999);
-
-    filter.created_at = { $gte: start, $lte: end };
-  }
-
-  const skip = (page - 1) * limit;
-
-  const users = await User.find(filter)
-    .skip(skip)
-    .limit(limit)
-    .sort({ created_at: -1 })
+  const results = await userQuery.modelQuery
+    .select("-isDeleted -__v")
     .lean();
 
-  const totalUsers = await User.countDocuments(filter);
+  const meta = await userQuery.countTotal();
 
-  if (users.length === 0) {
-    return [];
-  }
   return {
-    meta: {
-      totalResult: totalUsers,
-      currentPage: page,
-      limit,
-      totalPages: Math.ceil(totalUsers / limit),
-    },
-    results: users,
+    meta,
+    results,
   };
 };
 
@@ -86,6 +64,16 @@ const updateMyProfile = async (userId: string, payload: any) => {
     { $set: payload },
     { new: true, runValidators: true },
   ).lean();
+
+  if (user) {
+    await queueNotification({
+      userId: user._id.toString(),
+      title: "Profile Updated",
+      message: "Your profile has been updated successfully.",
+      channels: ["in-app"], // Using socket notification
+    });
+  }
+
   return user;
 };
 
