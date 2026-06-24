@@ -1,5 +1,5 @@
 import swaggerJsdoc from "swagger-jsdoc";
-import { PORT, NODE_ENV } from "./index";
+import { PORT } from "./index";
 
 const options: swaggerJsdoc.Options = {
   definition: {

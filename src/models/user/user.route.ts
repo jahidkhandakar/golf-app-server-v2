@@ -4,7 +4,10 @@ import { auth } from "./../../middlewares/auth";
 import validateRequest from "./../../shared/validateRequest";
 import { multiUploadHandler } from "./../../middlewares/fileUploadHandler";
 import { userValidation } from "./user.validation";
-import { cacheMiddleware, clearCacheMiddleware } from "./../../middlewares/cacheMiddleware";
+import {
+  cacheMiddleware,
+  clearCacheMiddleware,
+} from "./../../middlewares/cacheMiddleware";
 
 const router = express.Router();
 

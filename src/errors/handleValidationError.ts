@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { IErrorMessage, IErrorResponse } from "./../interface/index";
 
 const handleValidationError = (
-  error: mongoose.Error.ValidationError
+  error: mongoose.Error.ValidationError,
 ): IErrorResponse => {
   const errorMessages: IErrorMessage[] = Object.values(error.errors).map(
     (err: mongoose.Error.ValidatorError | mongoose.Error.CastError) => {
@@ -18,7 +18,7 @@ const handleValidationError = (
         path: err.path,
         message: err.message,
       };
-    }
+    },
   );
 
   return {

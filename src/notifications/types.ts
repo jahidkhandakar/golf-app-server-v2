@@ -15,8 +15,6 @@ export interface INotificationProvider {
   send(payload: NotificationPayload): Promise<void>;
 }
 
-
-
 export interface SendNotificationParams {
   sender?: Types.ObjectId | string;
   receiver?: Types.ObjectId | string;

@@ -1,27 +1,27 @@
 import { Document, Types } from "mongoose";
 
 export interface IClub extends Document {
-    name?: string;
+  name?: string;
 
-    createdBy: Types.ObjectId;
+  createdBy: Types.ObjectId;
 
-    clubLogo: Record<string, any>;
+  clubLogo: Record<string, any>;
 
-    location: {
-        type: "Point";
-        coordinates: number[];
-    };
+  location: {
+    type: "Point";
+    coordinates: number[];
+  };
 
-    description?: string;
+  description?: string;
 
-    maxPlayers?: number;
+  maxPlayers?: number;
 
-    isDeleted: boolean;
+  isDeleted: boolean;
 
-    city?: string;
+  city?: string;
 
-    totalPlayers: number;
+  totalPlayers: number;
 
-    createdAt: Date;
-    updatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

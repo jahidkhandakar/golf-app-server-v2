@@ -6,9 +6,9 @@ import { connectDB } from "./config/db";
 import { PORT, NODE_ENV } from "./config";
 import { logger } from "./logger/logger";
 import { initIO } from "./utils/io";
-import redis from "./config/redis";
+import "./config/redis";
 import "dotenv/config";
-
+// import redis from "./config/redis";
 const numCPUs = os.cpus().length;
 
 async function main() {

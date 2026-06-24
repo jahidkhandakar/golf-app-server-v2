@@ -6,7 +6,7 @@ export class SocketProvider implements INotificationProvider {
   async send(payload: NotificationPayload): Promise<void> {
     try {
       const io = getIO();
-      
+
       // Sending to a specific room named after the userId
       io.to(payload.userId).emit("notification", {
         title: payload.title,
@@ -14,11 +14,11 @@ export class SocketProvider implements INotificationProvider {
         data: payload.data,
         timestamp: new Date().toISOString(),
       });
-      
+
       logger.info(`Socket notification sent to user ${payload.userId}`);
     } catch (error) {
       logger.error(error, "Failed to send socket notification:");
-      // We don't necessarily want to throw here if socket is not available, 
+      // We don't necessarily want to throw here if socket is not available,
       // but for a "professional" system we should at least log it.
     }
   }

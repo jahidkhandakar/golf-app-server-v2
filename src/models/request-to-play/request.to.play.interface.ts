@@ -4,18 +4,18 @@ type RequestType = "challenge" | "open";
 type RequestStatus = "pending" | "accepted" | "rejected";
 
 export interface IRequestToPlay extends Document {
-    requestedUser: Types.ObjectId;
-    challengedUser?: Types.ObjectId;
-    tournamentcreator: Types.ObjectId;
-    tournament?: Types.ObjectId;
+  requestedUser: Types.ObjectId;
+  challengedUser?: Types.ObjectId;
+  tournamentcreator: Types.ObjectId;
+  tournament?: Types.ObjectId;
 
-    tournamentType?: string;
+  tournamentType?: string;
 
-    requestType: RequestType;
-    status: RequestStatus;
+  requestType: RequestType;
+  status: RequestStatus;
 
-    isOnlyRequestToJoin: boolean;
+  isOnlyRequestToJoin: boolean;
 
-    createdAt: Date;
-    updatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

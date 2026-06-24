@@ -9,7 +9,7 @@ const sendError = (
   statusCode: number,
   errorData: ErrorData,
 ): void => {
-    console.log("error is :", errorData?.message);
+  console.log("error is :", errorData?.message);
   res.status(statusCode).send({
     success: false,
     ...errorData,

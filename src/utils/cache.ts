@@ -29,7 +29,11 @@ export const cacheGet = async (key: string): Promise<any | null> => {
   return null;
 };
 
-export const cacheSet = async (key: string, value: any, ttlSeconds: number = 30): Promise<void> => {
+export const cacheSet = async (
+  key: string,
+  value: any,
+  ttlSeconds: number = 30,
+): Promise<void> => {
   if (isRedisConnected && redis) {
     try {
       await redis.set(key, JSON.stringify(value), "EX", ttlSeconds);
@@ -42,7 +46,7 @@ export const cacheSet = async (key: string, value: any, ttlSeconds: number = 30)
   // Fallback to memory
   memoryCache.set(key, {
     data: value,
-    expires: Date.now() + ttlSeconds * 1000
+    expires: Date.now() + ttlSeconds * 1000,
   });
 };
 
@@ -77,4 +81,3 @@ export const cacheDeletePattern = async (pattern: string): Promise<void> => {
     }
   }
 };
-

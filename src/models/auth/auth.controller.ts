@@ -45,7 +45,7 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
     );
   }
 
-  const { refresh_token, token, ...result } = await AuthService.userRegister(
+  const { refresh_token, token } = await AuthService.userRegister(
     userData as any,
   );
 

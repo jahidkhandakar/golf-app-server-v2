@@ -10,7 +10,7 @@ import { IErrorResponse } from "./../interface/index";
 import { logger } from "../logger/logger";
 import { NODE_ENV } from "../config";
 
-const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   let errorResponse: IErrorResponse = {
     success: false,
     statusCode: err.statusCode || 500,
@@ -68,7 +68,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
       method: req.method,
       stack: NODE_ENV === "development" ? err?.stack : undefined,
     },
-    "❌ Global Error"
+    "❌ Global Error",
   );
 
   // Send Response

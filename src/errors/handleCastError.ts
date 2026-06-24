@@ -1,9 +1,7 @@
-import mongoose from "mongoose"; 
+import mongoose from "mongoose";
 import { IErrorResponse } from "./../interface/index";
 
-const handleCastError = (
-  err: mongoose.Error.CastError,
-): IErrorResponse => {
+const handleCastError = (err: mongoose.Error.CastError): IErrorResponse => {
   return {
     success: false,
     statusCode: 400,

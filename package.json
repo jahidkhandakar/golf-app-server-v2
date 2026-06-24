@@ -43,8 +43,8 @@
   },
   "lint-staged": {
     "src/**/*.{ts,js}": [
-      "npm run lint:fix",
-      "npm run prettier:fix"
+      "eslint --fix",
+      "prettier --write"
     ]
   },
   "dependencies": {

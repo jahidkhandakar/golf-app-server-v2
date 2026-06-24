@@ -21,7 +21,7 @@ if (redis) {
     defaultJobOptions: {
       removeOnComplete: true,
       removeOnFail: 1000,
-    }
+    },
   });
 
   notificationQueue.on("error", (err) => {
@@ -38,7 +38,7 @@ if (redis) {
     },
     {
       connection: redis,
-    }
+    },
   );
 
   notificationWorker.on("error", (err) => {
@@ -55,16 +55,20 @@ export const queueNotification = async (payload: NotificationPayload) => {
   // Use Redis if available
   if (isRedisConnected && notificationQueue) {
     try {
-      await notificationQueue.add(`notify-${payload.userId}-${Date.now()}`, payload, {
-        attempts: 3,
-        backoff: { type: "exponential", delay: 1000 },
-      });
+      await notificationQueue.add(
+        `notify-${payload.userId}-${Date.now()}`,
+        payload,
+        {
+          attempts: 3,
+          backoff: { type: "exponential", delay: 1000 },
+        },
+      );
       return;
     } catch (error) {
       // Failed to queue, will fallback below
     }
   }
-  
+
   // Professional Fallback: Process immediately in background
   setImmediate(async () => {
     try {

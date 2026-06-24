@@ -9,7 +9,6 @@ import { logHttpRequests } from "./logger/logger";
 import notFound from "./middlewares/notFound";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import { CLIENT_URL, NODE_ENV } from "./config";
-import sendResponse from "./utils/sendResponse";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger";
 
@@ -17,11 +16,12 @@ const app: Application = express();
 
 // ------------------ Security & Performance ------------------
 app.use(helmet());
+
 app.use(
   cors({
     origin: NODE_ENV === "production" ? CLIENT_URL : true,
     credentials: true,
-  })
+  }),
 );
 
 // Optimized compression
@@ -29,7 +29,7 @@ app.use(
   compression({
     level: 1, // Prioritize speed over compression ratio
     threshold: 1024, // Only compress responses > 1KB
-  })
+  }),
 );
 
 app.set("trust proxy", 1);
@@ -38,7 +38,7 @@ app.use(
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 1000, // Limit each IP to 1000 requests per windowMs
     message: "Too many requests from this IP, please try again later",
-  })
+  }),
 );
 
 // ------------------ Parsing & Logging ------------------
@@ -76,7 +76,6 @@ app.get("/health", (_req, res) => {
     },
   });
 });
-
 
 // ------------------ 404 & Error Handling ------------------
 app.use(notFound);

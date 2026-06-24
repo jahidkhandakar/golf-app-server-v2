@@ -2,31 +2,32 @@ import { Types } from "mongoose";
 
 type ChallengeMatchStatus = "pending" | "playing" | "completed";
 
-
 export interface IChallengeMatch {
-    tournament: Types.ObjectId;
-    groupName: string;
+  tournament: Types.ObjectId;
+  groupName: string;
 
-    player1: IPlayer;
-    player2: IPlayer;
+  player1: IPlayer;
+  player2: IPlayer;
 
-    round: number;
+  round: number;
 
-    winner?: Types.ObjectId;
+  winner?: Types.ObjectId;
 
-    teeTime: Date;
+  teeTime: Date;
 
-    location?: string;
+  location?: string;
 
-    status: ChallengeMatchStatus;
+  status: ChallengeMatchStatus;
 
-    isDeleted: boolean;
+  isDeleted: boolean;
 
-    createdAt?: Date;
-    updatedAt?: Date;
+  deletedAt?: Date;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IPlayer {
-    user: Types.ObjectId;
-    handicap?: number;
+  user: Types.ObjectId;
+  handicap?: number;
 }

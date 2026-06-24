@@ -16,9 +16,7 @@ const getAll = async (query: any) => {
     .paginate()
     .fields();
 
-  const results = await userQuery.modelQuery
-    .select("-isDeleted -__v")
-    .lean();
+  const results = await userQuery.modelQuery.select("-isDeleted -__v").lean();
 
   const meta = await userQuery.countTotal();
 

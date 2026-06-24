@@ -1,4 +1,9 @@
-import { INotificationProvider, NotificationPayload, NotificationChannel, SendNotificationParams } from "./types";
+import {
+  INotificationProvider,
+  NotificationPayload,
+  NotificationChannel,
+  SendNotificationParams,
+} from "./types";
 import { EmailProvider } from "./providers/email.provider";
 import { SocketProvider } from "./providers/socket.provider";
 import { logger } from "../logger/logger";
@@ -40,8 +45,6 @@ export class NotificationService {
 
 export const notificationService = new NotificationService();
 
-
-
 export const sendNotification = async ({
   sender,
   receiver,
@@ -51,7 +54,6 @@ export const sendNotification = async ({
   tournamentId = null,
   paymentId = null,
   linkId = null,
-  isRequest = false,
   metadata = null,
 }: SendNotificationParams): Promise<INotification> => {
   try {

@@ -4,10 +4,18 @@ node_modules
 distuploads/
 config.bat
 
+/dist
+/uploads
+/temp_files
+/logs
+/logs/errors
+/.vscode
+/.idea  
 
 
 # Environment files
-.env
-.env.*
 !.env.example
 !.env*.example
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat

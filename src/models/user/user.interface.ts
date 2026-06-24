@@ -1,5 +1,4 @@
 import { Document } from "mongoose";
-import { IRole } from "./../../middlewares/auth";
 import { Types } from "mongoose";
 
 export type UserRole = "admin" | "user" | "basicUser" | "superUser";

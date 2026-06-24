@@ -9,7 +9,6 @@ export interface JwtUserPayload {
 
 export type IRole = "admin" | "user" | "basicUser" | "superUser";
 
-
 type AuthRole = IRole | "common";
 
 export const auth = (...roles: AuthRole[]): RequestHandler => {

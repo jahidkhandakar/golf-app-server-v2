@@ -3,19 +3,19 @@ import { Types } from "mongoose";
 type MessageType = "text" | "image" | "video" | "file";
 
 export interface IMessage {
-    _id?: Types.ObjectId;
-    chatRoomId: Types.ObjectId;
-    sender: Types.ObjectId;
+  _id?: Types.ObjectId;
+  chatRoomId: Types.ObjectId;
+  sender: Types.ObjectId;
 
-    message?: string;
-    media?: string;
+  message?: string;
+  media?: string;
 
-    messageType: MessageType;
+  messageType: MessageType;
 
-    timestamp?: Date;
+  timestamp?: Date;
 
-    isDeleted: boolean;
+  isDeleted: boolean;
 
-    createdAt?: Date;
-    updatedAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

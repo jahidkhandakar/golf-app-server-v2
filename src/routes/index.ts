@@ -1,6 +1,19 @@
 import express from "express";
 import { UserRoutes } from "../models/user/user.route";
 import { AuthRoutes } from "../models/auth/auth.route";
+import { SponsoredTournamentRoutes } from "../models/sponsored-tournament/sponsored.tournament.route";
+import { SubscribeRoutes } from "../models/subscribe/subscribe.route";
+import { SubscriptionRoutes } from "../models/subscription/subscription.route";
+import { TeeSheetRoutes } from "../models/tee-sheet/tee.sheet.route";
+import { TournamentRoutes } from "../models/tournament/tournament.route";
+import { TournamentResultRoutes } from "../models/tournament-result/tournament.result.route";
+import { RequestToPlayRoutes } from "../models/request-to-play/request.to.play.route";
+import { InvitationRoutes } from "../models/invitation/invitation.route";
+import { NotificationRoutes } from "../models/notification/notification.route";
+import { ChatRoutes } from "../models/chat/chat.route";
+import { MessageRoutes } from "../models/message/message.route";
+import { ClubRoutes } from "../models/club/club.router";
+import { ChallengeMatchRoutes } from "../models/challenge-match/challenge.match.route";
 
 const router = express.Router();
 
@@ -12,6 +25,58 @@ const apiRoutes: any[] = [
   {
     path: "/user",
     route: UserRoutes,
+  },
+  {
+    path: "/sponsored-tournament",
+    route: SponsoredTournamentRoutes,
+  },
+  {
+    path: "/subscribe",
+    route: SubscribeRoutes,
+  },
+  {
+    path: "/subscription",
+    route: SubscriptionRoutes,
+  },
+  {
+    path: "/notification",
+    route: NotificationRoutes,
+  },
+  {
+    path: "/invitation",
+    route: InvitationRoutes,
+  },
+  {
+    path: "/request-to-play",
+    route: RequestToPlayRoutes,
+  },
+  {
+    path: "/tee-sheet",
+    route: TeeSheetRoutes,
+  },
+  {
+    path: "/tournament",
+    route: TournamentRoutes,
+  },
+  {
+    path: "/leader-board",
+    route: TournamentResultRoutes,
+  },
+  {
+    path: "/chat-room",
+    route: ChatRoutes,
+  },
+  {
+    path: "/message",
+    route: MessageRoutes,
+  },
+  {
+    path: "/club",
+    route: ClubRoutes,
+  },
+  {
+    path: "/challenge-match",
+    route: ChallengeMatchRoutes,
   },
 ];
 

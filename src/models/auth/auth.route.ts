@@ -7,13 +7,13 @@ import passport from "passport";
 import { clearCacheMiddleware } from "./../../middlewares/cacheMiddleware";
 
 const router = express.Router();
- 
+
 router.post(
   "/register",
   validateRequest(authValidation.registerSchema),
   AuthController.registerUser,
 );
- 
+
 router.post(
   "/login",
   validateRequest(authValidation.loginUserSchema),

@@ -1,3 +1,5 @@
+import { Message } from "../message/message.model";
+import { Tournament } from "../tournament/tournament.model";
 import { ChatRoom } from "./chat.model";
 
 const createsingleChat = async (creator: string, data: any) => {
@@ -22,15 +24,11 @@ const createsingleChat = async (creator: string, data: any) => {
     .populate([
       { path: "participants", select: "name image" },
       {
-        path: "btournamentId",
+        path: "tournamentId",
         select: "tournamentName clubName tournamentCreator  tournamentImage",
       },
-      {
-        path: "stournamentId",
-        select: "tournamentName  tournamentCreator tournamentImage",
-      },
     ])
-    .select("_id participants chatCreator btournamentId type isPinned");
+    .select("_id participants chatCreator tournamentId type isPinned");
   // .populate({
   //     path: "lastMessage",
   //     select: "message media timestamp",
@@ -90,15 +88,11 @@ const createsingleChat = async (creator: string, data: any) => {
     .populate([
       { path: "participants", select: "name image" },
       {
-        path: "btournamentId",
+        path: "tournamentId",
         select: "tournamentName clubName tournamentCreator  tournamentImage",
       },
-      {
-        path: "stournamentId",
-        select: "tournamentName  tournamentCreator tournamentImage",
-      },
     ])
-    .select("_id participants chatCreator btournamentId type isPinned");
+    .select("_id participants chatCreator tournamentId type isPinned");
   // .populate({
   //     path: "lastMessage",
   //     select: "message media timestamp",
@@ -125,22 +119,17 @@ const createsingleChat = async (creator: string, data: any) => {
 // create the group message
 
 const createGroupChat = async (userId: string, data: any) => {
-  const isBigTournament = data.type === "big";
   const tournamentId = data.tournamentid;
 
   // Get tournament by type
-  const tournament = isBigTournament
-    ? await Tournament.findById(tournamentId)
-    : await SmallTournament.findById(tournamentId);
+  const tournament = await Tournament.findById(tournamentId);
 
   if (!tournament) {
     throw new Error("Tournament not found.");
   }
 
   // Check if chat already exists for the tournament
-  const existingChat = isBigTournament
-    ? await ChatRoom.findOne({ btournamentId: tournamentId })
-    : await ChatRoom.findOne({ stournamentId: tournamentId });
+  const existingChat = await ChatRoom.findOne({ tournamentId });
 
   // Prepare participant list
   const tournamentCreator = tournament.tournamentCreator?.toString();
@@ -156,7 +145,7 @@ const createGroupChat = async (userId: string, data: any) => {
 
   // Clean up players list
   const cleanedTournamentPlayersList = (tournament.tournamentPlayersList || [])
-    .map((p: string) => p.toString())
+    .map((p: any) => p.toString())
     .filter((p: string) => p !== tournamentCreator);
 
   // Merge all and make them unique
@@ -188,15 +177,11 @@ const createGroupChat = async (userId: string, data: any) => {
       .populate([
         { path: "participants", select: "name image" },
         {
-          path: "btournamentId",
+          path: "tournamentId",
           select: "tournamentName clubName tournamentCreator  tournamentImage",
         },
-        {
-          path: "stournamentId",
-          select: "tournamentName  tournamentCreator tournamentImage",
-        },
       ])
-      .select("_id participants chatCreator btournamentId type isPinned");
+      .select("_id participants chatCreator tournamentId type isPinned");
     // .populate({
     //     path: "lastMessage",
     //     select: "message media timestamp",
@@ -228,14 +213,9 @@ const createGroupChat = async (userId: string, data: any) => {
   const chatData = {
     participants,
     chatCreator: tournamentCreator,
-    type: "group",
+    type: "group" as const,
+    tournamentId,
   };
-
-  if (isBigTournament) {
-    chatData.btournamentId = tournamentId;
-  } else {
-    chatData.stournamentId = tournamentId;
-  }
 
   const newChat = await ChatRoom.create(chatData);
 
@@ -263,15 +243,11 @@ const createGroupChat = async (userId: string, data: any) => {
     .populate([
       { path: "participants", select: "name image" },
       {
-        path: "btournamentId",
+        path: "tournamentId",
         select: "tournamentName clubName tournamentCreator  tournamentImage",
       },
-      {
-        path: "stournamentId",
-        select: "tournamentName  tournamentCreator tournamentImage",
-      },
     ])
-    .select("_id participants chatCreator btournamentId type isPinned");
+    .select("_id participants chatCreator tournamentId type isPinned");
 
   return {
     status: 201,
@@ -294,14 +270,10 @@ const showMyChat = async (userId: string) => {
     })
     .populate("participants", "name image")
     .populate(
-      "btournamentId",
+      "tournamentId",
       "tournamentName clubName tournamentCreator  tournamentImage",
     )
-    .populate(
-      "stournamentId",
-      "tournamentName  tournamentCreator tournamentImage",
-    )
-    .select("_id participants chatCreator btournamentId type isPinned")
+    .select("_id participants chatCreator tournamentId type isPinned")
     .sort({ isPinned: -1, updatedAt: -1 }) // Sort by pinned first, then by latest update
 
     .exec();

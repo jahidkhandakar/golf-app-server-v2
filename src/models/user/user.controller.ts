@@ -9,7 +9,6 @@ import AppError from "../../errors/AppError";
 import { User } from "./user.model";
 import { JwtUserPayload } from "../../middlewares/auth";
 
-
 const getAll = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.getAll(req.query as any);
   sendResponse(res, {
@@ -19,7 +18,6 @@ const getAll = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { id: userId } = req.params;

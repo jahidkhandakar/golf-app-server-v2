@@ -1,25 +1,24 @@
 import { Types } from "mongoose";
 
 export interface IChatRoom {
-    _id?: Types.ObjectId;
-    participants: Types.ObjectId[];
-    chatCreator: Types.ObjectId;
-    stournamentId?: Types.ObjectId;
-    btournamentId?: Types.ObjectId;
+  _id?: Types.ObjectId;
+  participants: Types.ObjectId[];
+  chatCreator: Types.ObjectId;
+  tournamentId?: Types.ObjectId;
 
-    type: "single" | "group";
+  type: "single" | "group";
 
-    groupName?: string;
-    groupImage?: string;
-    description?: string;
+  groupName?: string;
+  groupImage?: string;
+  description?: string;
 
-    lastMessage?: Types.ObjectId;
+  lastMessage?: Types.ObjectId;
 
-    groupAdmins: Types.ObjectId[];
+  groupAdmins: Types.ObjectId[];
 
-    isPinned: boolean;
-    isDeleted: boolean;
+  isPinned: boolean;
+  isDeleted: boolean;
 
-    createdAt?: Date;
-    updatedAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

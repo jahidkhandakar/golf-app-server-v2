@@ -30,8 +30,9 @@ export const connectDB = async (retryCount = 0): Promise<void> => {
 
     if (retryCount < MAX_RETRIES) {
       logger.info(
-        `Retrying connection in ${RETRY_INTERVAL / 1000}s... (${retryCount + 1
-        }/${MAX_RETRIES})`
+        `Retrying connection in ${RETRY_INTERVAL / 1000}s... (${
+          retryCount + 1
+        }/${MAX_RETRIES})`,
       );
       setTimeout(() => connectDB(retryCount + 1), RETRY_INTERVAL);
     } else {
