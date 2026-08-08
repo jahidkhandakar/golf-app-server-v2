@@ -16,6 +16,11 @@ const guestSchema = new Schema<IGuest>(
 const contestConfigSchema = new Schema<IContestConfig>(
   {
     holePars: { type: [Number], default: [] },
+    scoringFormat: {
+      type: String,
+      enum: ["gross", "net"],
+      default: "gross",
+    },
     kpHoles: { type: [Number], default: [] },
     longDriveHoles: { type: [Number], default: [] },
     payoutMode: {
@@ -118,6 +123,12 @@ const tournamentSchema = new Schema<ITournament>(
       required: true,
     },
 
+    country: {
+      type: String,
+      uppercase: true,
+      trim: true,
+    },
+
     courseLocation: {
       type: courseLocationSchema,
       required: true,
@@ -189,6 +200,11 @@ const tournamentSchema = new Schema<ITournament>(
     },
 
     finalResultsPushSent: {
+      type: Boolean,
+      default: false,
+    },
+
+    amountsPurged: {
       type: Boolean,
       default: false,
     },

@@ -25,6 +25,29 @@ const cancelRound = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/** Staff: (re)arm the 24-hour money purge. Body: { delayMs? }. Normally armed
+ *  automatically at Final. (spec §2) */
+const scheduleAmountPurge = catchAsync(async (req: Request, res: Response) => {
+  const { id: userId } = req.user as JwtUserPayload;
+  const tournamentId = req.params.id as string;
+
+  const result = await TournamentRulingsService.scheduleFinalAmountPurge(
+    tournamentId,
+    userId as string,
+    req.body?.delayMs,
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: result.scheduled
+      ? "Amount purge scheduled."
+      : "Amount purge could not be scheduled (queue unavailable).",
+    data: result,
+  });
+});
+
 export const TournamentRulingsController = {
   cancelRound,
+  scheduleAmountPurge,
 };

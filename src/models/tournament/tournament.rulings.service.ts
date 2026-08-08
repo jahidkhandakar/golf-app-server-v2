@@ -4,6 +4,7 @@ import { Tournament } from "./tournament.model";
 import { ChallengeMatch } from "../challenge-match/challenge.match.model";
 import { assertTournamentStaff } from "../../shared/tournamentStaff";
 import { sendNotification } from "../../notifications/notification.service";
+import { scheduleAmountPurge } from "../../jobs/amount.purge.job";
 
 /**
  * Staff Cancel Round (spec §10): everything is voided and no engines fire. All
@@ -64,6 +65,25 @@ export const cancelRound = async (
   return { cancelled: true, notified: players.length };
 };
 
+/**
+ * Schedule the 24-hour money purge for a tournament (spec §2). Normally invoked
+ * automatically by finalize(); exposed here so staff can (re)arm it and for
+ * testing. `delayMs` is overridable (e.g. for verification), defaulting to 24h.
+ */
+export const scheduleFinalAmountPurge = async (
+  tournamentId: string,
+  userId: string,
+  delayMs?: number,
+) => {
+  const tournament = await Tournament.findById(tournamentId);
+  if (!tournament) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Tournament not found");
+  }
+  await assertTournamentStaff(tournament, userId);
+  return scheduleAmountPurge(tournamentId, delayMs);
+};
+
 export const TournamentRulingsService = {
   cancelRound,
+  scheduleFinalAmountPurge,
 };

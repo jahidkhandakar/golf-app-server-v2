@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./../config/index";
 import { User } from "../models/user/user.model";
+import { CountryCapService } from "../models/country-cap/country.cap.service";
 
 const MONGODB_URI = process.env.DATABASE_URL;
 
@@ -37,6 +38,11 @@ async function seedDatabase() {
       await existingAdmin.save();
       console.log("✅ Admin status updated to active!");
     }
+
+    // Country payout caps (spec §2) — global baseline + major golf nations.
+    console.log("🌍 Seeding country payout caps...");
+    await CountryCapService.ensureSeeded();
+    console.log("✅ Country caps seeded.");
 
     // YOUR OTHER SEEDING LOGIC (users, providers, etc.)
     console.log("\n🎉 Admin setup completed!");

@@ -48,6 +48,8 @@ const createTournament = z.object({
         message: "courseName is required",
       }),
 
+      country: z.string().optional(),
+
       courseRating: z
         .number()
         .min(60, "courseRating must be at least 60")
@@ -90,6 +92,7 @@ const createTournament = z.object({
       contestConfig: z
         .object({
           holePars: z.array(z.number()).optional(),
+          scoringFormat: z.enum(["gross", "net"]).optional(),
           kpHoles: z.array(z.number()).optional(),
           longDriveHoles: z.array(z.number()).optional(),
           payoutMode: z.enum(["poolSplit", "carryover"]).optional(),

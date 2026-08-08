@@ -15,6 +15,7 @@ import { MessageRoutes } from "../models/message/message.route";
 import { ClubRoutes } from "../models/club/club.router";
 import { ClubUsersRoutes } from "../models/club-users/club.users.route";
 import { KpLiveRoutes } from "../models/kp-live/kp.live.route";
+import { CountryCapRoutes } from "../models/country-cap/country.cap.route";
 import { ChallengeMatchRoutes } from "../models/challenge-match/challenge.match.route";
 
 const router = express.Router();
@@ -83,6 +84,10 @@ const apiRoutes: any[] = [
   {
     path: "/tournaments",
     route: KpLiveRoutes,
+  },
+  {
+    path: "/country-cap",
+    route: CountryCapRoutes,
   },
   {
     path: "/challenge-match",

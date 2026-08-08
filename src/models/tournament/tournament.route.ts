@@ -154,4 +154,11 @@ router.patch(
   TournamentRulingsController.cancelRound,
 );
 
+// Staff: (re)arm the 24-hour money purge (normally auto-armed at Final).
+router.patch(
+  "/schedule-purge/:id",
+  auth("common"),
+  TournamentRulingsController.scheduleAmountPurge,
+);
+
 export const TournamentRoutes = router;

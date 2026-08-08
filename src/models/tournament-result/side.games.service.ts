@@ -11,6 +11,7 @@ import {
   EnginePlayerScore,
 } from "../../shared/engine/skins.engine";
 import { skinsCarried } from "../../shared/engine/rulings";
+import { getCapForCountry } from "../country-cap/country.cap.service";
 
 /** Staff gate for a tournament: its creator, or a creator/sub-admin of its
  *  club. Score entry and side-game management are staff-only. */
@@ -151,17 +152,53 @@ export const getLiveSideGames = async (tournamentId: string) => {
     pot: cfg.kpPot ?? 0,
     mode: cfg.payoutMode ?? "poolSplit",
   });
-  const kpValues = [...kpValuesMap.entries()].map(([hole, value]) => ({
+  let kpValues = [...kpValuesMap.entries()].map(([hole, value]) => ({
     hole,
     value,
   }));
 
+  // ── Money compliance (spec §2) ──────────────────────────────────────────
+  const totalPayout =
+    (cfg.skinsPot ?? 0) + (cfg.kpPot ?? 0) + (cfg.longDrivePot ?? 0);
+  const cap = await getCapForCountry(tournament.country);
+  const overCap = totalPayout > cap.capAmount;
+  // Amounts show only when the toggle is on AND the payout is within the cap;
+  // over the cap they are hidden entirely regardless of the toggle.
+  const amountsVisible = Boolean(tournament.showAmounts) && !overCap;
+
+  let skinsResults = skins;
+  let skinsPotCarried: number | null = skinsCarried(
+    cfg.skinsPot ?? 0,
+    skins.length,
+  );
+
+  if (!amountsVisible) {
+    // Names, holes and win status survive; dollar figures are withheld.
+    skinsResults = skins.map((s) => ({ ...s, value: 0 }));
+    kpValues = kpValues.map((k) => ({ ...k, value: 0 }));
+    skinsPotCarried = null;
+  }
+
+  const compliance = {
+    // "net" format with a cash skins pot → amateur-status warning.
+    netScoringCashWarning:
+      cfg.scoringFormat === "net" && (cfg.skinsPot ?? 0) > 0,
+    // Handicap-based deductions in play → disclosure note.
+    deductionDisclosure:
+      (cfg.skinsDeductMidPercent ?? 0) > 0 ||
+      (cfg.skinsDeductPlusPercent ?? 0) > 0,
+    cap,
+    totalPayout,
+    overCap,
+  };
+
   return {
-    skins,
+    skins: skinsResults,
     kpValues,
-    // Zero skins won → the whole pot carries, nothing is distributed (spec §10).
-    skinsPotCarried: skinsCarried(cfg.skinsPot ?? 0, skins.length),
+    skinsPotCarried,
     showAmounts: tournament.showAmounts,
+    amountsVisible,
+    compliance,
     configured: true,
   };
 };

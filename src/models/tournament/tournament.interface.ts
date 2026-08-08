@@ -23,6 +23,9 @@ export interface IGuest {
 export interface IContestConfig {
   /** Par for holes 1..18 in order. */
   holePars: number[];
+  /** "net" tournaments with a cash skins pot trigger the amateur-status
+   *  warning at setup (spec §2). Default "gross". */
+  scoringFormat?: "gross" | "net";
   kpHoles: number[];
   longDriveHoles: number[];
   payoutMode: PayoutMode;
@@ -58,6 +61,10 @@ export interface ITournament {
   city: string;
   courseName: string;
 
+  /** ISO 3166-1 alpha-2 country code, used to resolve the applicable payout cap
+   *  (spec §2). Falls back to the GLOBAL baseline when absent. */
+  country?: string;
+
   courseLocation: ICourseLocation;
 
   status: "active" | "closed" | "completed" | "cancelled";
@@ -91,4 +98,8 @@ export interface ITournament {
   /** Set true by finalize(); the FCM push job reads it to notify players that
    *  results are final (spec §7). */
   finalResultsPushSent: boolean;
+
+  /** Set true by the 24h purge job once all dollar amounts have been deleted
+   *  (spec §2). Names, holes and win status survive. */
+  amountsPurged: boolean;
 }
