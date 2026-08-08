@@ -1,6 +1,10 @@
 import multer, { FileFilterCallback } from "multer";
 import { Request, Response, NextFunction } from "express";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import sharp from "sharp";
@@ -135,6 +139,39 @@ export const uploadToS3 = async (
   processAndUploadBackground(file, key);
 
   return url;
+};
+
+/**
+ * Extract the S3 object key from a stored public URL
+ * (https://{bucket}.s3.{region}.amazonaws.com/{key}).
+ */
+export const s3KeyFromUrl = (url: string): string | null => {
+  const marker = ".amazonaws.com/";
+  const i = url.indexOf(marker);
+  if (i === -1) return null;
+  return url.slice(i + marker.length) || null;
+};
+
+/**
+ * Permanently delete one or more stored files from S3 by their public URL.
+ * Used by KP Live to purge a dethroned leader's photos (spec §1). Best-effort:
+ * failures are logged, never thrown, so they can't block the request.
+ */
+export const deleteFromS3 = async (urls: string | string[]): Promise<void> => {
+  const list = Array.isArray(urls) ? urls : [urls];
+  await Promise.all(
+    list.map(async (url) => {
+      const key = s3KeyFromUrl(url);
+      if (!key) return;
+      try {
+        await s3Client.send(
+          new DeleteObjectCommand({ Bucket: AWS_BUCKET_NAME, Key: key }),
+        );
+      } catch (error) {
+        console.error(`S3 delete failed for ${key}:`, error);
+      }
+    }),
+  );
 };
 
 export const multiUploadHandler = (
