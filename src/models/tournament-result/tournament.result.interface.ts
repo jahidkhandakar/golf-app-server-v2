@@ -24,7 +24,11 @@ export interface IChallengeMatchResult {
 export interface IPlayerScore {
   user?: Types.ObjectId;
   teeBox?: string;
+  /** Total gross (sum of holes when entered by-hole). */
   score?: number;
+  /** Per-hole strokes, index 0 = hole 1, 0 = not entered. Required for the
+   *  skins/KP engine to compute winners. */
+  holes?: number[];
 }
 
 export interface ITournamentResult extends Document {

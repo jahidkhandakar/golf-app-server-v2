@@ -1,12 +1,29 @@
 import express from "express";
 import { auth } from "./../../middlewares/auth";
 import { TournamentResultController } from "./tournament.result.controller";
+import { SideGamesController } from "./side.games.controller";
 import {
   cacheMiddleware,
   clearCacheMiddleware,
 } from "../../middlewares/cacheMiddleware";
 
 const router = express.Router();
+
+// ── Live side games (authoritative engine) ──────────────────────────────
+// Staff enters per-hole scores; anyone in the event can read the live board.
+// Club-scoped staff authorization is enforced in the service.
+router.post(
+  "/:tournamentId/score-entry",
+  clearCacheMiddleware("tournamentResult"),
+  auth("common"),
+  SideGamesController.enterHoleScores,
+);
+
+router.get(
+  "/:tournamentId/live-side-games",
+  auth("common"),
+  SideGamesController.getLiveSideGames,
+);
 
 router.get(
   "/get-all",

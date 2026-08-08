@@ -50,6 +50,7 @@ const playerScoreSchema = new Schema<IPlayerScore>({
   },
   teeBox: String,
   score: Number,
+  holes: { type: [Number], default: undefined },
 });
 
 const tournamentResultSchema: Schema<ITournamentResult> = new Schema(
