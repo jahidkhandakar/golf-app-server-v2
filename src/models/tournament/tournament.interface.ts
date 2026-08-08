@@ -60,7 +60,7 @@ export interface ITournament {
 
   courseLocation: ICourseLocation;
 
-  status: "active" | "closed" | "completed";
+  status: "active" | "closed" | "completed" | "cancelled";
 
   isWinnerDeclared: boolean;
 

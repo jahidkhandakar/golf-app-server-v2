@@ -61,7 +61,9 @@ const ChallengeMatchSchema = new Schema<IChallengeMatch>(
 
     status: {
       type: String,
-      enum: ["pending", "playing", "completed"],
+      // pushed: exact-tie challenge, no movement, no penalty (spec §10).
+      // void: cancelled with the round, no penalty (spec §10 cancel-round).
+      enum: ["pending", "playing", "completed", "pushed", "void"],
       default: "pending",
     },
 

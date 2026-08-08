@@ -10,6 +10,7 @@ import {
   EngineContestConfig,
   EnginePlayerScore,
 } from "../../shared/engine/skins.engine";
+import { skinsCarried } from "../../shared/engine/rulings";
 
 /** Staff gate for a tournament: its creator, or a creator/sub-admin of its
  *  club. Score entry and side-game management are staff-only. */
@@ -122,7 +123,10 @@ export const getLiveSideGames = async (tournamentId: string) => {
     .filter((ps: any) => ps.user && Array.isArray(ps.holes))
     .map((ps: any) => ({ playerName: ps.user.toString(), holes: ps.holes }));
 
-  // Handicaps for the deduction bands.
+  // Handicaps for the deduction bands. A visitor with fewer than 3 rounds at
+  // the club has no established handicap (clubHandicap is null), so we omit them
+  // here — the engine then applies no deduction band to them (spec §10 visitor
+  // rule).
   const users = await User.find({
     _id: { $in: scores.map((s) => s.playerName) },
   }).select("clubHandicap");
@@ -155,6 +159,8 @@ export const getLiveSideGames = async (tournamentId: string) => {
   return {
     skins,
     kpValues,
+    // Zero skins won → the whole pot carries, nothing is distributed (spec §10).
+    skinsPotCarried: skinsCarried(cfg.skinsPot ?? 0, skins.length),
     showAmounts: tournament.showAmounts,
     configured: true,
   };

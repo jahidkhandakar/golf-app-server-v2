@@ -7,6 +7,7 @@ import {
 } from "../../middlewares/cacheMiddleware";
 import { TournamentValidation } from "./tournament.validation";
 import { TournamentController } from "./tournament.controller";
+import { TournamentRulingsController } from "./tournament.rulings.controller";
 
 const router = express.Router();
 
@@ -143,6 +144,14 @@ router.get(
   cacheMiddleware("tournament", 60),
   auth("common"),
   TournamentController.getAllUsersInTournament,
+);
+
+// Staff Cancel Round: void the tournament + active challenges, notify players.
+router.patch(
+  "/cancel-round/:id",
+  clearCacheMiddleware("tournament"),
+  auth("common"),
+  TournamentRulingsController.cancelRound,
 );
 
 export const TournamentRoutes = router;

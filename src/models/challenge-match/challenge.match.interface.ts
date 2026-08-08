@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
-type ChallengeMatchStatus = "pending" | "playing" | "completed";
+type ChallengeMatchStatus =
+  "pending" | "playing" | "completed" | "pushed" | "void";
 
 export interface IChallengeMatch {
   tournament: Types.ObjectId;

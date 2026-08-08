@@ -125,7 +125,7 @@ const tournamentSchema = new Schema<ITournament>(
 
     status: {
       type: String,
-      enum: ["active", "closed", "completed"],
+      enum: ["active", "closed", "completed", "cancelled"],
       default: "active",
     },
 
