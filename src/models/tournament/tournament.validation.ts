@@ -84,6 +84,28 @@ const createTournament = z.object({
       handicapToRange: z.number().optional(),
 
       playingConditionAdjustment: z.number().optional(),
+
+      showAmounts: z.boolean().optional(),
+
+      contestConfig: z
+        .object({
+          holePars: z.array(z.number()).optional(),
+          kpHoles: z.array(z.number()).optional(),
+          longDriveHoles: z.array(z.number()).optional(),
+          payoutMode: z.enum(["poolSplit", "carryover"]).optional(),
+          skinsPot: z.number().min(0).optional(),
+          kpPot: z.number().min(0).optional(),
+          longDrivePot: z.number().min(0).optional(),
+          useCategories: z.boolean().optional(),
+          skinsDeductMidPercent: z.number().min(0).max(50).optional(),
+          skinsDeductPlusPercent: z.number().min(0).max(50).optional(),
+          kpLiveEnabled: z.boolean().optional(),
+          guestsInSideGames: z.boolean().optional(),
+          skinsOptOut: z.array(objectId).optional(),
+          kpOptOut: z.array(objectId).optional(),
+          guests: z.array(z.object({ name: z.string() })).optional(),
+        })
+        .optional(),
     })
     .superRefine((data, ctx) => {
       // BIG tournament rules

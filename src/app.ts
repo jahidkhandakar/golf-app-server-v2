@@ -8,7 +8,7 @@ import rateLimit from "express-rate-limit";
 import { logHttpRequests } from "./logger/logger";
 import notFound from "./middlewares/notFound";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
-import { CLIENT_URL, NODE_ENV } from "./config";
+import { CLIENT_URL, CORS_ORIGINS, NODE_ENV } from "./config";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger";
 
@@ -17,9 +17,27 @@ const app: Application = express();
 // ------------------ Security & Performance ------------------
 app.use(helmet());
 
+// Allowed browser origins: the admin dashboard today, and a player web build
+// later (spec §15). Native mobile requests carry no Origin and always pass.
+// Non-production allows any origin for local development.
+const allowedOrigins = [
+  ...(CLIENT_URL ? [CLIENT_URL] : []),
+  ...(CORS_ORIGINS
+    ? CORS_ORIGINS.split(",")
+        .map((o) => o.trim())
+        .filter(Boolean)
+    : []),
+];
+
 app.use(
   cors({
-    origin: NODE_ENV === "production" ? CLIENT_URL : true,
+    origin: (origin, callback) => {
+      // No Origin header: native apps, curl, same-origin/server-to-server.
+      if (!origin) return callback(null, true);
+      if (NODE_ENV !== "production") return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     credentials: true,
   }),
 );

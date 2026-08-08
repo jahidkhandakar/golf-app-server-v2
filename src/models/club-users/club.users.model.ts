@@ -20,6 +20,16 @@ const clubUserSchema = new Schema<IClubUser>(
       enum: ["pending", "accepted", "rejected"],
       default: "pending",
     },
+
+    role: {
+      type: String,
+      enum: ["member", "subAdmin"],
+      default: "member",
+    },
+
+    displayName: {
+      type: String,
+    },
   },
   {
     timestamps: true,

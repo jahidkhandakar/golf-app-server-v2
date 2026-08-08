@@ -13,6 +13,7 @@ import { NotificationRoutes } from "../models/notification/notification.route";
 import { ChatRoutes } from "../models/chat/chat.route";
 import { MessageRoutes } from "../models/message/message.route";
 import { ClubRoutes } from "../models/club/club.router";
+import { ClubUsersRoutes } from "../models/club-users/club.users.route";
 import { ChallengeMatchRoutes } from "../models/challenge-match/challenge.match.route";
 
 const router = express.Router();
@@ -73,6 +74,10 @@ const apiRoutes: any[] = [
   {
     path: "/club",
     route: ClubRoutes,
+  },
+  {
+    path: "/club-users",
+    route: ClubUsersRoutes,
   },
   {
     path: "/challenge-match",

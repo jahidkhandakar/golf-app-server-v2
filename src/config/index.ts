@@ -63,6 +63,10 @@ const envSchema = z.object({
     message: "STRIPE_SECRET_KEY is required",
   }),
   CLIENT_URL: z.string().optional(),
+  // Comma-separated list of allowed browser origins (admin dashboard, and
+  // later the player web build). Native mobile requests send no Origin and are
+  // always allowed. See spec §15 (forward compatibility for a web origin).
+  CORS_ORIGINS: z.string().optional(),
   SUPPORT_EMAIL: z.string().optional(),
   SUPPORT_PHONE: z.string().optional(),
   REDIS_URL: z.string().default("redis://localhost:6379"),
@@ -116,6 +120,7 @@ export const {
   STRIPE_WEBHOOK_SECRET,
   STRIPE_SECRET_KEY,
   CLIENT_URL,
+  CORS_ORIGINS,
   SUPPORT_EMAIL,
   SUPPORT_PHONE,
   REDIS_URL,
