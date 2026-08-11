@@ -4,6 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { TournamentRulingsService } from "./tournament.rulings.service";
+import { TournamentFinalizeService } from "./tournament.finalize.service";
 
 /** Staff Cancel Round: void the tournament and its active challenges, notify
  *  players. Body: { reason? }. (spec §10) */
@@ -47,7 +48,23 @@ const scheduleAmountPurge = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/** Staff: finalize the tournament — official winners, push, and armed purge. */
+const finalize = catchAsync(async (req: Request, res: Response) => {
+  const { id: userId } = req.user as JwtUserPayload;
+  const result = await TournamentFinalizeService.finalize(
+    req.params.id as string,
+    userId as string,
+  );
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Results are final.",
+    data: result,
+  });
+});
+
 export const TournamentRulingsController = {
   cancelRound,
   scheduleAmountPurge,
+  finalize,
 };

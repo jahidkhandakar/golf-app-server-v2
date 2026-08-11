@@ -62,6 +62,11 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string({
     message: "STRIPE_SECRET_KEY is required",
   }),
+  // Firebase service account for FCM push (spec §7). Optional: push no-ops
+  // gracefully when unset. FIREBASE_PRIVATE_KEY may contain literal "\n".
+  FIREBASE_PROJECT_ID: z.string().optional(),
+  FIREBASE_CLIENT_EMAIL: z.string().optional(),
+  FIREBASE_PRIVATE_KEY: z.string().optional(),
   CLIENT_URL: z.string().optional(),
   // Comma-separated list of allowed browser origins (admin dashboard, and
   // later the player web build). Native mobile requests send no Origin and are
@@ -121,6 +126,9 @@ export const {
   STRIPE_SECRET_KEY,
   CLIENT_URL,
   CORS_ORIGINS,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_CLIENT_EMAIL,
+  FIREBASE_PRIVATE_KEY,
   SUPPORT_EMAIL,
   SUPPORT_PHONE,
   REDIS_URL,

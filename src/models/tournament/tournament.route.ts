@@ -161,4 +161,12 @@ router.patch(
   TournamentRulingsController.scheduleAmountPurge,
 );
 
+// Staff: finalize — official winners (KP Live + skins), push, and armed purge.
+router.patch(
+  "/finalize/:id",
+  clearCacheMiddleware("tournament"),
+  auth("common"),
+  TournamentRulingsController.finalize,
+);
+
 export const TournamentRoutes = router;
