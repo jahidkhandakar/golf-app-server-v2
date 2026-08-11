@@ -47,6 +47,25 @@ const clubSchema: Schema<IClub> = new Schema(
       default: false,
     },
 
+    isPrivate: {
+      type: Boolean,
+      default: false,
+    },
+
+    perMemberFee: {
+      type: Number,
+    },
+    perMemberCurrency: {
+      type: String,
+      default: "USD",
+    },
+    stripeCustomerId: {
+      type: String,
+    },
+    stripePaymentMethodId: {
+      type: String,
+    },
+
     city: {
       type: String,
     },

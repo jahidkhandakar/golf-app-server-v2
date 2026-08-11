@@ -38,9 +38,11 @@ const getAllClubs = async (query: any, userId: string) => {
   };
   const maxDistanceInMeters = 60000;
 
-  // Dynamic match query
+  // Dynamic match query. Private clubs are excluded from discovery/search
+  // server-side (spec §12) — they are reachable only via an access code.
   const matchQuery: any = {
     isDeleted: false,
+    isPrivate: { $ne: true },
   };
 
   if (searchTerm) {

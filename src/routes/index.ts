@@ -18,6 +18,7 @@ import { KpLiveRoutes } from "../models/kp-live/kp.live.route";
 import { RosterRoutes } from "../models/tournament/roster.route";
 import { CountryCapRoutes } from "../models/country-cap/country.cap.route";
 import { TemplateRoutes } from "../models/template/template.route";
+import { MemberSlotRoutes } from "../models/member-slot/member.slot.route";
 import { ChallengeMatchRoutes } from "../models/challenge-match/challenge.match.route";
 
 const router = express.Router();
@@ -98,6 +99,10 @@ const apiRoutes: any[] = [
   {
     path: "/templates",
     route: TemplateRoutes,
+  },
+  {
+    path: "/clubs",
+    route: MemberSlotRoutes,
   },
   {
     path: "/challenge-match",
