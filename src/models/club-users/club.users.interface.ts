@@ -20,6 +20,15 @@ export interface IClubUser extends Document {
    *  account name. Null for public-club members. (Spec §12.) */
   displayName?: string;
 
+  /** Club leaderboard opt-in (off by default). Ranked = opted in AND an
+   *  established handicap. (spec §9) */
+  leaderboardOptedIn: boolean;
+
+  /** Stored ladder position, seeded from handicap order at opt-in and then
+   *  moved only by challenges — never re-sorted by handicap. Null when not
+   *  ranked. (spec §9) */
+  leaderboardPosition?: number | null;
+
   createdAt?: Date;
   updatedAt?: Date;
 }

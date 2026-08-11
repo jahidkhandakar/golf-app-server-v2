@@ -144,6 +144,11 @@ const userSchema = new Schema<IUser>(
       default: "blue",
     },
 
+    travelTrialsRemaining: {
+      type: Number,
+      default: 0,
+    },
+
     fcmToken: {
       type: String,
       required: false,

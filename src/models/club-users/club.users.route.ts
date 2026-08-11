@@ -15,4 +15,16 @@ router.patch(
   ClubUsersController.setSubAdmin,
 );
 
+// Club leaderboard opt-in / opt-out (spec §9).
+router.post(
+  "/leaderboard/opt-in/:clubId",
+  auth("common"),
+  ClubUsersController.optInLeaderboard,
+);
+router.post(
+  "/leaderboard/opt-out/:clubId",
+  auth("common"),
+  ClubUsersController.optOutLeaderboard,
+);
+
 export const ClubUsersRoutes = router;

@@ -30,6 +30,16 @@ const clubUserSchema = new Schema<IClubUser>(
     displayName: {
       type: String,
     },
+
+    leaderboardOptedIn: {
+      type: Boolean,
+      default: false,
+    },
+
+    leaderboardPosition: {
+      type: Number,
+      default: null,
+    },
   },
   {
     timestamps: true,

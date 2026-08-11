@@ -1,6 +1,7 @@
 import { Message } from "../message/message.model";
 import { Tournament } from "../tournament/tournament.model";
 import { ChatRoom } from "./chat.model";
+import { assertCanStartConversation } from "../../shared/messagingZone";
 
 const createsingleChat = async (creator: string, data: any) => {
   // Add the creator to the participants array (if not already added)
@@ -45,13 +46,18 @@ const createsingleChat = async (creator: string, data: any) => {
 
   // ]);
 
-  // If a chat already exists, return a 200 response without creating a new chat
+  // If a chat already exists, return a 200 response without creating a new chat.
+  // Existing conversations stay open for both sides regardless of location.
   if (existingChat) {
     return {
       status: 200,
       existingChat,
     };
   }
+
+  // Starting a NEW conversation is gated by the messaging-zone rule (spec §11):
+  // free users only in their home zone or on a travel trial.
+  await assertCanStartConversation(creator);
 
   // Proceed with creating the new chat if no existing chat is found
   const datas = {

@@ -55,6 +55,22 @@ const updateChallengeMatches = catchAsync(async (req, res) => {
   });
 });
 
+const resolveChallengeMatch = catchAsync(async (req, res) => {
+  const { id: userId } = req.user as JwtUserPayload;
+  const { id: matchId } = req.params;
+  const result = await ChallengeMatchService.resolveChallengeMatch(
+    userId,
+    matchId as string,
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Challenge resolved from the scorecards.",
+    data: result,
+  });
+});
+
 const completeTournament = catchAsync(async (req, res) => {
   const { id: userId } = req.user as JwtUserPayload;
   const { id: tournamentId } = req.params;
@@ -92,6 +108,7 @@ export const ChallengeMatchController = {
   getChallengeMatches,
   createChallengeMatch,
   updateChallengeMatches,
+  resolveChallengeMatch,
   completeTournament,
   deleteChallengeMatch,
 };

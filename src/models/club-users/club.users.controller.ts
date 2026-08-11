@@ -4,6 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { ClubUsersService } from "./club.users.service";
+import { ClubLadderService } from "./club.ladder.service";
 
 /** GET the caller's resolved role in a club (creator/subAdmin/member/nonMember). */
 const getMyClubRole = catchAsync(async (req: Request, res: Response) => {
@@ -44,7 +45,35 @@ const setSubAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/** Caller opts into the club leaderboard (seeds position from handicap order). */
+const optInLeaderboard = catchAsync(async (req: Request, res: Response) => {
+  const { id: userId } = req.user as JwtUserPayload;
+  const clubId = req.params.clubId as string;
+  const result = await ClubLadderService.optIn(clubId, userId as string);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "You're on the club leaderboard.",
+    data: { leaderboardPosition: result?.leaderboardPosition },
+  });
+});
+
+/** Caller opts out of the club leaderboard. */
+const optOutLeaderboard = catchAsync(async (req: Request, res: Response) => {
+  const { id: userId } = req.user as JwtUserPayload;
+  const clubId = req.params.clubId as string;
+  await ClubLadderService.optOut(clubId, userId as string);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "You've left the club leaderboard.",
+    data: null,
+  });
+});
+
 export const ClubUsersController = {
   getMyClubRole,
   setSubAdmin,
+  optInLeaderboard,
+  optOutLeaderboard,
 };

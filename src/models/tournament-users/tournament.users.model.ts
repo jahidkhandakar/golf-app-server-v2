@@ -16,7 +16,7 @@ const tournamentUserSchema: Schema<ITournamentUser> = new Schema(
 
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected"],
+      enum: ["pending", "accepted", "rejected", "standby", "no-show"],
       default: "pending",
     },
   },

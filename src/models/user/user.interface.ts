@@ -63,6 +63,11 @@ export interface IUser {
 
   teebox?: string;
 
+  /** Remaining travel trials for a free user — consumed when promoted from
+   *  standby into an out-of-zone event (spec §3). The full two-counter trial
+   *  system is spec §16. */
+  travelTrialsRemaining?: number;
+
   fcmToken?: string;
 
   oneTimeCode?: string | null;

@@ -5,6 +5,10 @@ import { formatDateTime } from "../../utils/formatDateTime";
 import { User } from "../user/user.model";
 import { TeeSheet } from "../tee-sheet/tee.sheet.model";
 import { Tournament } from "../tournament/tournament.model";
+import { ClubLadderService } from "../club-users/club.ladder.service";
+import { TournamentResult } from "../tournament-result/tournament.result.model";
+import { assertTournamentStaff } from "../../shared/tournamentStaff";
+import { resolveChallengeByScore } from "../../shared/engine/rulings";
 
 const createChallengeMatch = async (
   payload: any,
@@ -81,6 +85,23 @@ const createChallengeMatch = async (
       StatusCodes.BAD_REQUEST,
       "One or both players already in challenge",
     );
+  }
+
+  // Enforce the club leaderboard scaling rules (spec §9): both players must be
+  // ranked and within the challenge range. Only applies to club tournaments
+  // with an active ladder; skipped when the club has no active leaderboard.
+  if (tournament.club) {
+    const check = await ClubLadderService.validateChallenge(
+      tournament.club.toString(),
+      player1Id,
+      player2Id,
+    );
+    if (!check.allowed) {
+      throw new AppError(
+        StatusCodes.BAD_REQUEST,
+        check.reason ?? "Challenge not allowed under the leaderboard rules",
+      );
+    }
   }
 
   const lastMatch = await ChallengeMatch.findOne({
@@ -274,6 +295,76 @@ const completeTournament = async (userId: string, tournamentId: string) => {
   return findTournament;
 };
 
+/**
+ * Resolve a challenge from the submitted scorecards (spec §11): the ladder
+ * moves when scores determine the winner, NOT when the challenge is sent. Lower
+ * gross wins; an exact tie is a push (no movement, no penalty — spec §10). A
+ * decisive result moves the club ladder (winner takes loser's slot).
+ */
+const resolveChallengeMatch = async (userId: string, matchId: string) => {
+  const match = await ChallengeMatch.findById(matchId);
+  if (!match || match.isDeleted) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Challenge match not found");
+  }
+  if (["completed", "pushed", "void"].includes(match.status)) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      "This challenge is already resolved",
+    );
+  }
+
+  const tournament = await Tournament.findById(match.tournament);
+  if (!tournament) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Tournament not found");
+  }
+  await assertTournamentStaff(tournament, userId);
+
+  // Winner comes from the scorecards — require both to be in.
+  const result = await TournamentResult.findOne({
+    tournament: match.tournament,
+  });
+  const p1Id = match.player1.user.toString();
+  const p2Id = match.player2.user.toString();
+  const p1Score = result?.playerScores.find(
+    (s: any) => s.user?.toString() === p1Id,
+  );
+  const p2Score = result?.playerScores.find(
+    (s: any) => s.user?.toString() === p2Id,
+  );
+  if (!p1Score?.score || !p2Score?.score) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      "Both players' scorecards must be submitted before resolving",
+    );
+  }
+
+  const outcome = resolveChallengeByScore(p1Score.score, p2Score.score);
+
+  if (outcome === "push") {
+    match.status = "pushed";
+    match.winner = undefined;
+    await match.save();
+    return match;
+  }
+
+  const winnerId = outcome === "p1" ? p1Id : p2Id;
+  const loserId = outcome === "p1" ? p2Id : p1Id;
+  match.winner = outcome === "p1" ? match.player1.user : match.player2.user;
+  match.status = "completed";
+  await match.save();
+
+  // Move the club ladder off the scorecard result.
+  if (tournament.club) {
+    await ClubLadderService.applyChallengeResult(
+      tournament.club.toString(),
+      winnerId,
+      loserId,
+    );
+  }
+
+  return match;
+};
+
 const deleteChallengeMatch = async (matchId: string, userId: string) => {
   const match = await ChallengeMatch.findById(matchId);
 
@@ -330,6 +421,7 @@ export const ChallengeMatchService = {
   getChallengeMatches,
   createChallengeMatch,
   updateChallengeMatches,
+  resolveChallengeMatch,
   completeTournament,
   deleteChallengeMatch,
 };

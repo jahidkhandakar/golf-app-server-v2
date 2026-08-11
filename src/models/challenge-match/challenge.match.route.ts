@@ -29,6 +29,15 @@ router.patch(
   ChallengeMatchController.completeTournament,
 );
 
+// Resolve a challenge from the submitted scorecards (spec §11): moves the
+// ladder off the scores, not when the challenge was sent.
+router.patch(
+  "/resolve/:id",
+  auth("common"),
+  clearCacheMiddleware("challengeMatch"),
+  ChallengeMatchController.resolveChallengeMatch,
+);
+
 router.patch(
   "/update/:id",
   auth("common"),
