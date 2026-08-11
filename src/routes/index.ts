@@ -19,6 +19,7 @@ import { RosterRoutes } from "../models/tournament/roster.route";
 import { CountryCapRoutes } from "../models/country-cap/country.cap.route";
 import { TemplateRoutes } from "../models/template/template.route";
 import { MemberSlotRoutes } from "../models/member-slot/member.slot.route";
+import { IndoorRoutes } from "../models/indoor/indoor.route";
 import { ChallengeMatchRoutes } from "../models/challenge-match/challenge.match.route";
 
 const router = express.Router();
@@ -103,6 +104,10 @@ const apiRoutes: any[] = [
   {
     path: "/clubs",
     route: MemberSlotRoutes,
+  },
+  {
+    path: "/indoor",
+    route: IndoorRoutes,
   },
   {
     path: "/challenge-match",
