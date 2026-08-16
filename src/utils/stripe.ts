@@ -83,3 +83,63 @@ export const chargeOffSession = async (params: {
 
   return { id: data.id, status: data.status };
 };
+
+/**
+ * Mint a Stripe coupon (spec §16) for Stripe-billed items (private-club slots,
+ * sponsored banners). Either percentOff or amountOff (minor units) — not both.
+ * Returns the coupon id to store on the DiscountCode.
+ */
+export const createCoupon = async (params: {
+  percentOff?: number;
+  amountOff?: number;
+  currency?: string;
+  duration?: "once" | "repeating" | "forever";
+  durationInMonths?: number;
+  maxRedemptions?: number;
+  redeemBy?: Date;
+  name?: string;
+}): Promise<{ id: string }> => {
+  if (!isStripeConfigured()) {
+    throw new AppError(
+      StatusCodes.SERVICE_UNAVAILABLE,
+      "Payments are not configured",
+    );
+  }
+
+  const body: Record<string, string | number | undefined> = {
+    duration: params.duration ?? "once",
+    name: params.name,
+    max_redemptions: params.maxRedemptions,
+    percent_off: params.percentOff,
+    amount_off: params.amountOff,
+    currency: params.amountOff
+      ? (params.currency ?? "usd").toLowerCase()
+      : undefined,
+    duration_in_months:
+      params.duration === "repeating" ? params.durationInMonths : undefined,
+    redeem_by: params.redeemBy
+      ? Math.floor(params.redeemBy.getTime() / 1000)
+      : undefined,
+  };
+
+  const res = await fetch(`${STRIPE_API}/coupons`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: form(body),
+  });
+
+  const data = (await res.json()) as {
+    id?: string;
+    error?: { message?: string };
+  };
+  if (!res.ok || !data.id) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      data.error?.message ?? "Could not create coupon",
+    );
+  }
+  return { id: data.id };
+};

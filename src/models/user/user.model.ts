@@ -149,6 +149,11 @@ const userSchema = new Schema<IUser>(
       default: 0,
     },
 
+    compFreeUntil: {
+      type: Date,
+      default: null,
+    },
+
     fcmToken: {
       type: String,
       required: false,

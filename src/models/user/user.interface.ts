@@ -68,6 +68,10 @@ export interface IUser {
    *  system is spec §16. */
   travelTrialsRemaining?: number;
 
+  /** Comp entitlement (spec §16): free access through this date, granted by an
+   *  admin or a redeemed comp/earned code instead of a store refund. */
+  compFreeUntil?: Date | null;
+
   fcmToken?: string;
 
   oneTimeCode?: string | null;
