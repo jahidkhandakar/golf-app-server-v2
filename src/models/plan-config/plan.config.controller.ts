@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { JwtUserPayload } from "../../middlewares/auth";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { PlanConfigService } from "./plan.config.service";
+import { getAdmin } from "../../middlewares/adminAuth";
 
 const getPlans = catchAsync(async (_req: Request, res: Response) => {
   const result = await PlanConfigService.getPlans();
@@ -16,9 +16,8 @@ const getPlans = catchAsync(async (_req: Request, res: Response) => {
 });
 
 const updatePlan = catchAsync(async (req: Request, res: Response) => {
-  const { id: userId } = req.user as JwtUserPayload;
   const result = await PlanConfigService.updatePlan(
-    userId as string,
+    getAdmin(req).adminId,
     req.params.tier as "basicUser" | "superUser",
     req.body,
   );

@@ -5,12 +5,15 @@ import sendResponse from "../../utils/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { DiscountService } from "./discount.service";
 import { AdminAuditLog } from "../admin-audit/admin.audit.model";
+import { getAdmin } from "../../middlewares/adminAuth";
 
+// User id for user-facing actions (redeem/earn), admin id for billing controls.
 const uid = (req: Request) => (req.user as JwtUserPayload).id as string;
+const adminId = (req: Request) => getAdmin(req).adminId;
 
 // ── Admin: mint / import / manage ────────────────────────────────────────
 const mintComp = catchAsync(async (req: Request, res: Response) => {
-  const result = await DiscountService.mintComp(uid(req), req.body);
+  const result = await DiscountService.mintComp(adminId(req), req.body);
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     success: true,
@@ -20,7 +23,7 @@ const mintComp = catchAsync(async (req: Request, res: Response) => {
 });
 
 const mintCampaign = catchAsync(async (req: Request, res: Response) => {
-  const result = await DiscountService.mintCampaign(uid(req), req.body);
+  const result = await DiscountService.mintCampaign(adminId(req), req.body);
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     success: true,
@@ -30,7 +33,7 @@ const mintCampaign = catchAsync(async (req: Request, res: Response) => {
 });
 
 const importStoreCode = catchAsync(async (req: Request, res: Response) => {
-  const result = await DiscountService.importStoreCode(uid(req), req.body);
+  const result = await DiscountService.importStoreCode(adminId(req), req.body);
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
     success: true,
@@ -41,7 +44,7 @@ const importStoreCode = catchAsync(async (req: Request, res: Response) => {
 
 const grantComp = catchAsync(async (req: Request, res: Response) => {
   const result = await DiscountService.grantComp(
-    uid(req),
+    adminId(req),
     req.body.userId,
     Number(req.body.months),
   );
@@ -55,7 +58,7 @@ const grantComp = catchAsync(async (req: Request, res: Response) => {
 
 const revokeCode = catchAsync(async (req: Request, res: Response) => {
   const result = await DiscountService.revokeCode(
-    uid(req),
+    adminId(req),
     req.params.id as string,
   );
   sendResponse(res, {

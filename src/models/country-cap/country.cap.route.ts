@@ -1,5 +1,6 @@
 import express from "express";
 import { auth } from "../../middlewares/auth";
+import { adminAuth } from "../../middlewares/adminAuth";
 import { CountryCapController } from "./country.cap.controller";
 
 const router = express.Router();
@@ -7,8 +8,8 @@ const router = express.Router();
 // Readable by any authenticated client (setup forms show the applicable cap).
 router.get("/", auth("common"), CountryCapController.getAll);
 
-// Admin-only management — edit caps without a code deploy (spec §2).
-router.post("/", auth("admin"), CountryCapController.upsertCap);
-router.delete("/:countryCode", auth("admin"), CountryCapController.deleteCap);
+// Cap management behind the App-Admin identity (spec §2/§16).
+router.post("/", adminAuth, CountryCapController.upsertCap);
+router.delete("/:countryCode", adminAuth, CountryCapController.deleteCap);
 
 export const CountryCapRoutes = router;

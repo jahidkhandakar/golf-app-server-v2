@@ -1,6 +1,7 @@
 import express from "express";
 import { auth } from "../../middlewares/auth";
 import { multiUploadHandler } from "../../middlewares/fileUploadHandler";
+import { submissionLimiter } from "../../middlewares/rateLimiters";
 import { KpLiveController } from "./kp.live.controller";
 
 const router = express.Router();
@@ -15,6 +16,7 @@ router.get("/:id/kp-pins", auth("common"), KpLiveController.getPins);
 router.post(
   "/:id/kp-entry",
   auth("common"),
+  submissionLimiter,
   multiUploadHandler([{ name: "photos", maxCount: 2 }]),
   KpLiveController.submitEntry,
 );

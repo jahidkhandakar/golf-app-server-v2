@@ -5,23 +5,27 @@ import { AuthController } from "./auth.controller";
 import { auth } from "./../../middlewares/auth";
 import passport from "passport";
 import { clearCacheMiddleware } from "./../../middlewares/cacheMiddleware";
+import { authLimiter } from "./../../middlewares/rateLimiters";
 
 const router = express.Router();
 
 router.post(
   "/register",
+  authLimiter,
   validateRequest(authValidation.registerSchema),
   AuthController.registerUser,
 );
 
 router.post(
   "/login",
+  authLimiter,
   validateRequest(authValidation.loginUserSchema),
   AuthController.loginUser,
 );
 
 router.post(
   "/verify-otp",
+  authLimiter,
   clearCacheMiddleware("users"),
   validateRequest(authValidation.otpSchema),
   AuthController.verifyOtp,
@@ -29,24 +33,28 @@ router.post(
 
 router.post(
   "/resend-otp",
+  authLimiter,
   validateRequest(authValidation.forgotPasswordSchema),
   AuthController.resendOtp,
 );
 
 router.post(
   "/forgot-otp-verify",
+  authLimiter,
   validateRequest(authValidation.otpSchema),
   AuthController.forgotOtpverify,
 );
 
 router.post(
   "/forgot-password",
+  authLimiter,
   validateRequest(authValidation.forgotPasswordSchema),
   AuthController.forgotPassword,
 );
 
 router.post(
   "/reset-password",
+  authLimiter,
   clearCacheMiddleware("users"),
   validateRequest(authValidation.resetPasswordSchema),
   AuthController.resetPassword,

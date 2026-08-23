@@ -67,6 +67,14 @@ const envSchema = z.object({
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
+  // Separate App-Admin identity (spec §16). ADMIN_JWT_SECRET must differ from
+  // the user JWT secret; ADMIN_BASE_PATH is the unguessable, never-linked mount
+  // prefix (override per deployment). Session minutes drive inactivity logout.
+  ADMIN_JWT_SECRET: z.string().optional(),
+  ADMIN_BASE_PATH: z.string().default("admin-console"),
+  ADMIN_SESSION_MINUTES: z.string().default("30"),
+  ADMIN_CONSOLE_EMAIL: z.string().optional(),
+  ADMIN_CONSOLE_PASSWORD: z.string().optional(),
   CLIENT_URL: z.string().optional(),
   // Comma-separated list of allowed browser origins (admin dashboard, and
   // later the player web build). Native mobile requests send no Origin and are
@@ -126,6 +134,11 @@ export const {
   STRIPE_SECRET_KEY,
   CLIENT_URL,
   CORS_ORIGINS,
+  ADMIN_JWT_SECRET,
+  ADMIN_BASE_PATH,
+  ADMIN_SESSION_MINUTES,
+  ADMIN_CONSOLE_EMAIL,
+  ADMIN_CONSOLE_PASSWORD,
   FIREBASE_PROJECT_ID,
   FIREBASE_CLIENT_EMAIL,
   FIREBASE_PRIVATE_KEY,

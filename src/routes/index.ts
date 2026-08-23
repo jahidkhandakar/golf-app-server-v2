@@ -22,6 +22,8 @@ import { MemberSlotRoutes } from "../models/member-slot/member.slot.route";
 import { IndoorRoutes } from "../models/indoor/indoor.route";
 import { DiscountRoutes } from "../models/discount/discount.route";
 import { PlanConfigRoutes } from "../models/plan-config/plan.config.route";
+import { AdminAuthRoutes } from "../models/admin/admin.auth.route";
+import { ADMIN_BASE_PATH } from "../config";
 import { ChallengeMatchRoutes } from "../models/challenge-match/challenge.match.route";
 
 const router = express.Router();
@@ -118,6 +120,12 @@ const apiRoutes: any[] = [
   {
     path: "/plan-config",
     route: PlanConfigRoutes,
+  },
+  {
+    // Unguessable, never-linked admin console auth path (spec §16). Override
+    // ADMIN_BASE_PATH per deployment.
+    path: `/${ADMIN_BASE_PATH}/auth`,
+    route: AdminAuthRoutes,
   },
   {
     path: "/challenge-match",

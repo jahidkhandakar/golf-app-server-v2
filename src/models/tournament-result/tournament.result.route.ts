@@ -6,6 +6,7 @@ import {
   cacheMiddleware,
   clearCacheMiddleware,
 } from "../../middlewares/cacheMiddleware";
+import { submissionLimiter } from "../../middlewares/rateLimiters";
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.post(
   "/:tournamentId/score-entry",
   clearCacheMiddleware("tournamentResult"),
   auth("common"),
+  submissionLimiter,
   SideGamesController.enterHoleScores,
 );
 
