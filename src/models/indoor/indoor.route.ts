@@ -40,6 +40,7 @@ router.patch(
 
 // Sim sessions (sim board + Sim Social Rounds)
 router.post("/sessions", auth("common"), IndoorController.createSession);
+router.get("/sessions", auth("common"), IndoorController.listSessions);
 router.get("/sessions/:id", auth("common"), IndoorController.getSession);
 router.patch(
   "/sessions/:id/assign-bay",

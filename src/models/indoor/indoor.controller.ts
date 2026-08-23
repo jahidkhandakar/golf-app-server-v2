@@ -125,6 +125,18 @@ const getSession = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const listSessions = catchAsync(async (req: Request, res: Response) => {
+  const result = await SimSessionService.listSessions(
+    req.query.league as string | undefined,
+  );
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Sim sessions retrieved.",
+    data: result,
+  });
+});
+
 const assignBay = catchAsync(async (req: Request, res: Response) => {
   const result = await SimSessionService.assignBay(
     req.params.id as string,
@@ -164,6 +176,7 @@ export const IndoorController = {
   getStandings,
   createSession,
   getSession,
+  listSessions,
   assignBay,
   recordCheck,
 };

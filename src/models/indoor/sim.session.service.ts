@@ -43,6 +43,12 @@ export const getSession = async (sessionId: string) =>
     .populate("roster", "name image")
     .populate("bays.players", "name image");
 
+/** List sim sessions, optionally scoped to a league (newest first). */
+export const listSessions = async (leagueId?: string) =>
+  IndoorSession.find(leagueId ? { league: leagueId } : {}).sort({
+    createdAt: -1,
+  });
+
 /**
  * Creator assigns a player to a bay (spec §13 — no self-pairing, so only the
  * session creator arranges bays). Removes them from any other bay first; a
@@ -119,6 +125,7 @@ export const recordCheck = async (
 export const SimSessionService = {
   createSession,
   getSession,
+  listSessions,
   assignBay,
   recordCheck,
 };
