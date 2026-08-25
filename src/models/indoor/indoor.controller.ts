@@ -19,12 +19,49 @@ const createLeague = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const listLeagues = catchAsync(async (_req: Request, res: Response) => {
-  const result = await IndoorService.listLeagues();
+const listLeagues = catchAsync(async (req: Request, res: Response) => {
+  const result = await IndoorService.listLeagues(uid(req));
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: "Indoor leagues retrieved.",
+    data: result,
+  });
+});
+
+const createInvite = catchAsync(async (req: Request, res: Response) => {
+  const result = await IndoorService.createInvite(
+    req.params.id as string,
+    uid(req),
+    req.body.invitedName,
+  );
+  sendResponse(res, {
+    statusCode: StatusCodes.CREATED,
+    success: true,
+    message: "Invite created. Hand the code over personally.",
+    data: result,
+  });
+});
+
+const listInvites = catchAsync(async (req: Request, res: Response) => {
+  const result = await IndoorService.listInvites(
+    req.params.id as string,
+    uid(req),
+  );
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "League invites retrieved.",
+    data: result,
+  });
+});
+
+const joinLeague = catchAsync(async (req: Request, res: Response) => {
+  const result = await IndoorService.redeemInvite(uid(req), req.body.code);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "You've joined the private league.",
     data: result,
   });
 });
@@ -174,6 +211,9 @@ export const IndoorController = {
   creatorOverride,
   setFlights,
   getStandings,
+  createInvite,
+  listInvites,
+  joinLeague,
   createSession,
   getSession,
   listSessions,

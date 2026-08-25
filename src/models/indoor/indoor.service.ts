@@ -1,6 +1,12 @@
 import { StatusCodes } from "http-status-codes";
+import { randomBytes } from "crypto";
 import AppError from "../../errors/AppError";
-import { IndoorLeague, IndoorLeagueMember, IndoorRound } from "./indoor.model";
+import {
+  IndoorLeague,
+  IndoorLeagueMember,
+  IndoorRound,
+  LeagueInvite,
+} from "./indoor.model";
 import { differential, indoorHandicapIndex } from "./indoor.handicap";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -44,12 +50,30 @@ export const createLeague = async (userId: string, payload: any) => {
     totalRounds: payload.totalRounds ?? 10,
     startDate: payload.startDate ? new Date(payload.startDate) : new Date(),
     midSeasonPrizes: Boolean(payload.midSeasonPrizes),
+    isPrivate: Boolean(payload.isPrivate),
+    club: payload.club ?? null,
   });
   return league;
 };
 
-export const listLeagues = async () =>
-  IndoorLeague.find().sort({ createdAt: -1 });
+/**
+ * List leagues visible to the caller: all public leagues, plus private leagues
+ * the caller created or is a member of. Private leagues are invisible to
+ * everyone else (spec feedback — invite-only, undiscoverable).
+ */
+export const listLeagues = async (userId: string) => {
+  const memberships = await IndoorLeagueMember.find({ player: userId }).select(
+    "league",
+  );
+  const memberLeagueIds = memberships.map((m) => m.league);
+  return IndoorLeague.find({
+    $or: [
+      { isPrivate: { $ne: true } },
+      { createdBy: userId },
+      { _id: { $in: memberLeagueIds } },
+    ],
+  }).sort({ createdAt: -1 });
+};
 
 export const getLeague = async (leagueId: string) => {
   const league = await loadLeague(leagueId);
@@ -89,6 +113,15 @@ export const submitRound = async (
     league: leagueId,
     player: playerId,
   });
+
+  // Private leagues are invite-only — no self-join. Membership must already
+  // exist (created by redeeming an invite).
+  if (!member && league.isPrivate) {
+    throw new AppError(
+      StatusCodes.FORBIDDEN,
+      "This is a private league — you must be invited to join",
+    );
+  }
 
   // Entry closes 3 weeks after start for NEW entrants (existing keep playing).
   if (!member && now > start + ENTRY_WINDOW_MS) {
@@ -255,6 +288,80 @@ export const getStandings = async (leagueId: string) => {
   return result;
 };
 
+const generateInviteCode = (): string => {
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  const pick = (n: number) =>
+    Array.from(randomBytes(n))
+      .map((b) => chars[b % chars.length])
+      .join("");
+  return `GGW-${pick(4)}-${pick(4)}`;
+};
+
+/** Creator generates a one-time invite code for a private league. */
+export const createInvite = async (
+  leagueId: string,
+  userId: string,
+  invitedName: string,
+) => {
+  const league = await loadLeague(leagueId);
+  assertCreator(league, userId);
+  if (!invitedName?.trim()) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "invitedName is required");
+  }
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const invite = await LeagueInvite.create({
+        league: leagueId,
+        invitedName: invitedName.trim(),
+        accessCode: generateInviteCode(),
+      });
+      return { code: invite.accessCode, invite };
+    } catch (err: any) {
+      if (err?.code === 11000) continue; // duplicate code, retry
+      throw err;
+    }
+  }
+  throw new AppError(
+    StatusCodes.INTERNAL_SERVER_ERROR,
+    "Could not generate a unique invite code",
+  );
+};
+
+/** Creator lists a private league's invites (redeemed status included). */
+export const listInvites = async (leagueId: string, userId: string) => {
+  const league = await loadLeague(leagueId);
+  assertCreator(league, userId);
+  return LeagueInvite.find({ league: leagueId }).sort({ createdAt: -1 });
+};
+
+/**
+ * Redeem an invite code to join a private league (spec feedback). One-shot and
+ * atomic — the only way into a private league. Creates the membership.
+ */
+export const redeemInvite = async (userId: string, code: string) => {
+  const clean = code?.trim().toUpperCase();
+  if (!clean) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "An invite code is required");
+  }
+  const invite = await LeagueInvite.findOneAndUpdate(
+    { accessCode: clean, redeemed: false },
+    { redeemed: true, redeemedBy: userId },
+    { new: true },
+  );
+  if (!invite) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      "That invite code is unknown or already used",
+    );
+  }
+  await IndoorLeagueMember.findOneAndUpdate(
+    { league: invite.league, player: userId },
+    { $setOnInsert: { league: invite.league, player: userId } },
+    { upsert: true },
+  );
+  return { leagueId: invite.league };
+};
+
 export const IndoorService = {
   createLeague,
   listLeagues,
@@ -265,4 +372,7 @@ export const IndoorService = {
   isSkinsEligible,
   setFlights,
   getStandings,
+  createInvite,
+  listInvites,
+  redeemInvite,
 };

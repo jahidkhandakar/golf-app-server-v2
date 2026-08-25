@@ -7,7 +7,21 @@ const router = express.Router();
 // Leagues
 router.post("/leagues", auth("common"), IndoorController.createLeague);
 router.get("/leagues", auth("common"), IndoorController.listLeagues);
+// Join a private league by redeeming an invite code (before "/leagues/:id").
+router.post("/leagues/join", auth("common"), IndoorController.joinLeague);
 router.get("/leagues/:id", auth("common"), IndoorController.getLeague);
+
+// Private-league invites (creator only; enforced in the service).
+router.post(
+  "/leagues/:id/invites",
+  auth("common"),
+  IndoorController.createInvite,
+);
+router.get(
+  "/leagues/:id/invites",
+  auth("common"),
+  IndoorController.listInvites,
+);
 router.get(
   "/leagues/:id/standings",
   auth("common"),

@@ -22,6 +22,10 @@ export interface IIndoorLeague extends Document {
   totalRounds: number; // default 10
   startDate: Date;
   midSeasonPrizes: boolean;
+  /** Private leagues are invite-only and invisible to non-members — no one can
+   *  join on their own. Can stand alone or sit inside a private club (club). */
+  isPrivate: boolean;
+  club?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,6 +43,8 @@ const indoorLeagueSchema = new Schema<IIndoorLeague>(
     totalRounds: { type: Number, default: 10 },
     startDate: { type: Date, required: true },
     midSeasonPrizes: { type: Boolean, default: false },
+    isPrivate: { type: Boolean, default: false },
+    club: { type: Schema.Types.ObjectId, ref: "Club", default: null },
   },
   { timestamps: true },
 );
@@ -46,6 +52,42 @@ const indoorLeagueSchema = new Schema<IIndoorLeague>(
 export const IndoorLeague = model<IIndoorLeague>(
   "IndoorLeague",
   indoorLeagueSchema,
+);
+
+/**
+ * A one-time invite to a private league (spec feedback, 2026-08-05). The creator
+ * generates a code and hands it to the invited player, who redeems it to join —
+ * no one can join a private league on their own. Mirrors the private-club
+ * member-slot pattern (minus billing; indoor never collects money).
+ */
+export interface ILeagueInvite extends Document {
+  league: Types.ObjectId;
+  invitedName: string;
+  accessCode: string;
+  redeemed: boolean;
+  redeemedBy?: Types.ObjectId | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const leagueInviteSchema = new Schema<ILeagueInvite>(
+  {
+    league: {
+      type: Schema.Types.ObjectId,
+      ref: "IndoorLeague",
+      required: true,
+    },
+    invitedName: { type: String, required: true },
+    accessCode: { type: String, required: true, unique: true },
+    redeemed: { type: Boolean, default: false },
+    redeemedBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
+  },
+  { timestamps: true },
+);
+
+export const LeagueInvite = model<ILeagueInvite>(
+  "LeagueInvite",
+  leagueInviteSchema,
 );
 
 // ── League member (flight allocation + standings) ───────────────────────────
