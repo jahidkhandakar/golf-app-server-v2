@@ -9,7 +9,6 @@ config.bat
 /temp_files
 /logs
 /logs/errors
-/.vscode
 /.idea  
 
 
@@ -23,3 +22,4 @@ temp_interactive_push.bat
 # Environment secrets (never commit; use .env.example as the template)
 .env
 .env.local
+.gitignore
